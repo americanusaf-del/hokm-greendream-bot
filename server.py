@@ -7,22 +7,33 @@ import os
 import time
 from urllib.parse import parse_qsl
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import (
+    Flask,
+    jsonify,
+    request,
+    send_from_directory,
+)
 
 from telegram_bot.game import game_state
 
 
 app = Flask(__name__)
 
-BOT_TOKEN = os.environ.get("BOT_TOKEN", "").strip()
+BOT_TOKEN = os.environ.get(
+    "BOT_TOKEN",
+    "",
+).strip()
 
 
-def validate_telegram_data(init_data: str):
+def validate_telegram_data(
+    init_data: str,
+):
 
     if not init_data:
         return None
 
     try:
+
         parsed = dict(
             parse_qsl(
                 init_data,
@@ -30,7 +41,10 @@ def validate_telegram_data(init_data: str):
             )
         )
 
-        received_hash = parsed.pop("hash", None)
+        received_hash = parsed.pop(
+            "hash",
+            None,
+        )
 
         if not received_hash:
             return None
@@ -70,14 +84,19 @@ def validate_telegram_data(init_data: str):
         ):
             return None
 
-        user_json = parsed.get("user")
+        user_json = parsed.get(
+            "user"
+        )
 
         if not user_json:
             return None
 
-        return json.loads(user_json)
+        return json.loads(
+            user_json
+        )
 
     except Exception as exc:
+
         print(
             "Telegram validation error:",
             exc,
@@ -98,31 +117,39 @@ def current_user():
     )
 
 
-def require_player(game_id: str):
+def require_player(
+    game_id: str,
+):
 
     user = current_user()
 
     if not user:
+
         return None, (
             jsonify(
                 {
-                    "error": "کاربر تلگرام شناسایی نشد."
+                    "error":
+                        "کاربر تلگرام شناسایی نشد."
                 }
             ),
             401,
         )
 
-    player_id = int(user["id"])
+    player_id = int(
+        user["id"]
+    )
 
     game = game_state.get_game(
         game_id
     )
 
     if not game:
+
         return None, (
             jsonify(
                 {
-                    "error": "بازی پیدا نشد."
+                    "error":
+                        "بازی پیدا نشد."
                 }
             ),
             404,
@@ -134,10 +161,12 @@ def require_player(game_id: str):
     )
 
     if not player:
+
         return None, (
             jsonify(
                 {
-                    "error": "You are not a player"
+                    "error":
+                        "شما بازیکن این بازی نیستید."
                 }
             ),
             403,
@@ -146,9 +175,40 @@ def require_player(game_id: str):
     return user, None
 
 
-# --------------------------------------------------
-# MAIN WEB APP
-# --------------------------------------------------
+def advance_bots(
+    game_id: str,
+):
+
+    """
+    هر بار که صفحه وضعیت بازی را می‌گیرد،
+    اگر نوبت ربات باشد، ربات حرکت می‌کند.
+
+    این حلقه باعث می‌شود اگر چند ربات پشت سر هم
+    نوبت داشته باشند، بازی گیر نکند.
+    """
+
+    for _ in range(8):
+
+        game = game_state.get_game(
+            game_id
+        )
+
+        if not game:
+            return
+
+        if not game.started:
+            return
+
+        if game.finished:
+            return
+
+        result = game_state.bot_turn(
+            game_id
+        )
+
+        if result is None:
+            return
+
 
 @app.get("/")
 def home():
@@ -158,10 +218,6 @@ def home():
         "index.html",
     )
 
-
-# --------------------------------------------------
-# HEALTH CHECK
-# --------------------------------------------------
 
 @app.get("/api/health")
 def health():
@@ -173,12 +229,12 @@ def health():
     )
 
 
-# --------------------------------------------------
-# GET GAME
-# --------------------------------------------------
-
-@app.get("/api/game/<game_id>")
-def get_game(game_id):
+@app.get(
+    "/api/game/<game_id>"
+)
+def get_game(
+    game_id,
+):
 
     user, error = require_player(
         game_id
@@ -191,27 +247,36 @@ def get_game(game_id):
         user["id"]
     )
 
+    # حرکت خودکار ربات‌ها
+    advance_bots(
+        game_id
+    )
+
     state = game_state.state_for_player(
         game_id,
         player_id,
     )
 
     if state is None:
+
         return jsonify(
             {
-                "error": "بازی پیدا نشد."
+                "error":
+                    "بازی پیدا نشد."
             }
         ), 404
 
-    return jsonify(state)
+    return jsonify(
+        state
+    )
 
 
-# --------------------------------------------------
-# START GAME
-# --------------------------------------------------
-
-@app.post("/api/game/<game_id>/start")
-def start_game(game_id):
+@app.post(
+    "/api/game/<game_id>/start"
+)
+def start_game(
+    game_id,
+):
 
     user, error = require_player(
         game_id
@@ -230,11 +295,18 @@ def start_game(game_id):
     )
 
     if not ok:
+
         return jsonify(
             {
                 "error": message
             }
         ), 400
+
+    # اگر حاکم ربات باشد،
+    # همین‌جا حکم را انتخاب کند.
+    advance_bots(
+        game_id
+    )
 
     return jsonify(
         {
@@ -244,12 +316,12 @@ def start_game(game_id):
     )
 
 
-# --------------------------------------------------
-# SET HOKM
-# --------------------------------------------------
-
-@app.post("/api/game/<game_id>/hokm")
-def set_hokm(game_id):
+@app.post(
+    "/api/game/<game_id>/hokm"
+)
+def set_hokm(
+    game_id,
+):
 
     user, error = require_player(
         game_id
@@ -280,11 +352,18 @@ def set_hokm(game_id):
     )
 
     if not ok:
+
         return jsonify(
             {
                 "error": message
             }
         ), 400
+
+    # بعد از حکم، اگر نوبت ربات باشد،
+    # ربات‌ها حرکت می‌کنند.
+    advance_bots(
+        game_id
+    )
 
     return jsonify(
         {
@@ -294,12 +373,12 @@ def set_hokm(game_id):
     )
 
 
-# --------------------------------------------------
-# PLAY CARD
-# --------------------------------------------------
-
-@app.post("/api/game/<game_id>/play")
-def play_card(game_id):
+@app.post(
+    "/api/game/<game_id>/play"
+)
+def play_card(
+    game_id,
+):
 
     user, error = require_player(
         game_id
@@ -328,6 +407,7 @@ def play_card(game_id):
     )
 
     try:
+
         rank = int(rank)
 
     except (
@@ -337,7 +417,8 @@ def play_card(game_id):
 
         return jsonify(
             {
-                "error": "کارت نامعتبر است."
+                "error":
+                    "کارت نامعتبر است."
             }
         ), 400
 
@@ -349,11 +430,18 @@ def play_card(game_id):
     )
 
     if not ok:
+
         return jsonify(
             {
                 "error": message
             }
         ), 400
+
+    # بعد از بازی کارت،
+    # اگر نوبت ربات‌ها باشد حرکت می‌کنند.
+    advance_bots(
+        game_id
+    )
 
     return jsonify(
         {
@@ -362,10 +450,6 @@ def play_card(game_id):
         }
     )
 
-
-# --------------------------------------------------
-# RUN DIRECTLY
-# --------------------------------------------------
 
 if __name__ == "__main__":
 
