@@ -2,8 +2,15 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
     <title>حکم گرین‌دریم</title>
+
+    <!-- Telegram Mini App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
         * {
@@ -15,7 +22,12 @@
             margin: 0;
             min-height: 100vh;
             background:
-                radial-gradient(circle at top, #19713f 0%, #0d4428 45%, #062619 100%);
+                radial-gradient(
+                    circle at top,
+                    #19713f 0%,
+                    #0d4428 45%,
+                    #062619 100%
+                );
             color: white;
             font-family:
                 -apple-system,
@@ -614,6 +626,12 @@
 
 <script>
 
+    /*
+     * Telegram Mini App
+     *
+     * کتابخانه Telegram WebApp در <head> لود شده است.
+     */
+
     const tg =
         window.Telegram &&
         window.Telegram.WebApp
@@ -621,14 +639,33 @@
             : null;
 
     if (tg) {
+
         tg.ready();
+
         tg.expand();
+
+        /*
+         * بعضی نسخه‌های تلگرام اجازه می‌دهند
+         * رنگ رابط Mini App با محیط تلگرام هماهنگ شود.
+         */
+
+        try {
+            tg.setHeaderColor("#0d4428");
+            tg.setBackgroundColor("#062619");
+        } catch (error) {
+            console.log(
+                "Telegram UI settings unavailable."
+            );
+        }
     }
 
     let gameId = null;
     let game = null;
     let loading = false;
 
+    /*
+     * گرفتن initData واقعی تلگرام
+     */
     function getTelegramInitData() {
 
         if (!tg) {
@@ -638,6 +675,9 @@
         return tg.initData || "";
     }
 
+    /*
+     * پیدا کردن شناسه بازی
+     */
     function findGameId() {
 
         const params =
@@ -645,13 +685,20 @@
                 window.location.search
             );
 
-        let id =
+        /*
+         * حالت اصلی:
+         * https://.../?game=XXXX
+         */
+        const queryGame =
             params.get("game");
 
-        if (id) {
-            return id;
+        if (queryGame) {
+            return queryGame;
         }
 
+        /*
+         * حالت Telegram start_param
+         */
         if (tg) {
 
             const startParam =
@@ -666,20 +713,37 @@
         return null;
     }
 
+    /*
+     * ارتباط با API
+     */
     async function api(
         url,
         options = {}
     ) {
+
+        const initData =
+            getTelegramInitData();
 
         const headers = {
             "Content-Type":
                 "application/json",
 
             "X-Telegram-Init-Data":
-                getTelegramInitData(),
+                initData,
 
             ...(options.headers || {})
         };
+
+        /*
+         * اگر Telegram WebApp باز نشده باشد،
+         * initData وجود ندارد.
+         */
+        if (!initData) {
+
+            throw new Error(
+                "initdata_missing"
+            );
+        }
 
         const response =
             await fetch(
@@ -780,7 +844,7 @@
 
             const data =
                 await api(
-                    `/api/game/${gameId}`
+                    `/api/game/${encodeURIComponent(gameId)}`
                 );
 
             game = data.game;
@@ -858,6 +922,7 @@
                 "player";
 
             if (player.is_me) {
+
                 div.classList.add(
                     "me"
                 );
@@ -881,9 +946,11 @@
 
             div.innerHTML = `
                 <div class="player-avatar">
-                    ${avatars[
-                        player.position % 4
-                    ]}
+                    ${
+                        avatars[
+                            player.position % 4
+                        ]
+                    }
                 </div>
 
                 <div class="player-name">
@@ -914,9 +981,16 @@
 
         container.innerHTML = "";
 
+        const trick =
+            Array.isArray(
+                game.current_trick
+            )
+                ? game.current_trick
+                : [];
+
         for (
             const item
-            of game.current_trick
+            of trick
         ) {
 
             const card =
@@ -1001,7 +1075,11 @@
         container.innerHTML = "";
 
         const hand =
-            game.my_hand || [];
+            Array.isArray(
+                game.my_hand
+            )
+                ? game.my_hand
+                : [];
 
         const isMyTurn =
             game.current_player_id ===
@@ -1367,7 +1445,7 @@
         try {
 
             await api(
-                `/api/game/${gameId}/start`,
+                `/api/game/${encodeURIComponent(gameId)}/start`,
                 {
                     method: "POST"
                 }
@@ -1410,7 +1488,7 @@
         try {
 
             await api(
-                `/api/game/${gameId}/hokm`,
+                `/api/game/${encodeURIComponent(gameId)}/hokm`,
                 {
                     method: "POST",
                     body:
@@ -1461,7 +1539,7 @@
         try {
 
             await api(
-                `/api/game/${gameId}/play`,
+                `/api/game/${encodeURIComponent(gameId)}/play`,
                 {
                     method: "POST",
                     body:
@@ -1494,6 +1572,12 @@
     ) {
 
         const messages = {
+
+            initdata_missing:
+                "⚠️ بازی باید از داخل تلگرام باز شود.",
+
+            "Initdata is missing":
+                "⚠️ بازی باید از داخل تلگرام باز شود.",
 
             game_not_found:
                 "بازی پیدا نشد.",
@@ -1550,12 +1634,31 @@
     ) {
 
         return String(value)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
+            .replace(
+                /&/g,
+                "&amp;"
+            )
+            .replace(
+                /</g,
+                "&lt;"
+            )
+            .replace(
+                />/g,
+                "&gt;"
+            )
+            .replace(
+                /"/g,
+                "&quot;"
+            )
+            .replace(
+                /'/g,
+                "&#039;"
+            );
     }
+
+    /*
+     * شروع برنامه
+     */
 
     gameId =
         findGameId();
@@ -1569,8 +1672,22 @@
 
     } else {
 
-        loadGame();
+        /*
+         * اگر Mini App از تلگرام باز شده،
+         * چند لحظه برای آماده شدن WebApp صبر می‌کنیم.
+         */
+        setTimeout(
+            () => {
 
+                loadGame();
+
+            },
+            150
+        );
+
+        /*
+         * بروزرسانی خودکار بازی
+         */
         setInterval(
             () =>
                 loadGame(true),
