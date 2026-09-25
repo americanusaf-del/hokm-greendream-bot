@@ -2,25 +2,30 @@ from __future__ import annotations
 
 import random
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
+from typing import Optional
 
 
 SUITS = ["♥", "♦", "♣", "♠"]
-RANKS = [
-    "2", "3", "4", "5", "6", "7", "8",
-    "9", "10", "J", "Q", "K", "A",
-]
+RANKS = list(range(2, 15))
+
+RANK_NAMES = {
+    11: "J",
+    12: "Q",
+    13: "K",
+    14: "A",
+}
 
 
 @dataclass
 class Card:
     suit: str
-    rank: str
+    rank: int
 
-    def to_dict(self):
+    def to_dict(self) -> dict:
         return {
             "suit": self.suit,
             "rank": self.rank,
+            "label": RANK_NAMES.get(self.rank, str(self.rank)),
         }
 
 
@@ -28,81 +33,40 @@ class Card:
 class Player:
     id: int
     name: str
-    cards: List[Card] = field(default_factory=list)
+    cards: list[Card] = field(default_factory=list)
     tricks: int = 0
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "name": self.name,
-            "cards": [c.to_dict() for c in self.cards],
-            "tricks": self.tricks,
-        }
 
 
 @dataclass
 class GameRoom:
     game_id: str
     creator_id: int
-    creator_name: str
+    players: list[Player] = field(default_factory=list)
+
     max_players: int = 4
 
-    players: Dict[int, Player] = field(
-        default_factory=dict
-    )
-
     started: bool = False
+    finished: bool = False
+
     hakim_id: Optional[int] = None
     hokm: Optional[str] = None
 
     current_player_id: Optional[int] = None
 
-    current_trick: List[dict] = field(
-        default_factory=list
-    )
+    lead_suit: Optional[str] = None
 
-    scores: Dict[int, int] = field(
-        default_factory=dict
-    )
+    current_trick: list[dict] = field(default_factory=list)
 
     winner_id: Optional[int] = None
 
-    def add_player(
-        self,
-        player_id: int,
-        player_name: str,
-    ):
-        if player_id in self.players:
-            return self.players[player_id]
-
-        if self.started:
-            raise ValueError(
-                "بازی شروع شده و بازیکن جدید نمی‌تواند وارد شود."
-            )
-
-        if len(self.players) >= self.max_players:
-            raise ValueError(
-                "ظرفیت اتاق تکمیل است."
-            )
-
-        player = Player(
-            id=player_id,
-            name=player_name,
-        )
-
-        self.players[player_id] = player
-        self.scores[player_id] = 0
-
-        return player
+    team_a_score: int = 0
+    team_b_score: int = 0
 
 
 class GameState:
-    def __init__(self):
-        self.games: Dict[str, GameRoom] = {}
 
-    # --------------------------------------------
-    # ساخت اتاق
-    # --------------------------------------------
+    def __init__(self):
+        self.games: dict[str, GameRoom] = {}
 
     def create_game(
         self,
@@ -112,76 +76,108 @@ class GameState:
         max_players: int = 4,
     ) -> GameRoom:
 
-        if max_players not in (1, 2, 4):
-            max_players = 4
-
         game = GameRoom(
             game_id=game_id,
             creator_id=creator_id,
-            creator_name=creator_name,
             max_players=max_players,
         )
 
-        game.add_player(
-            creator_id,
-            creator_name,
+        game.players.append(
+            Player(
+                id=creator_id,
+                name=creator_name,
+            )
         )
 
         self.games[game_id] = game
 
         return game
 
-    # --------------------------------------------
-    # گرفتن اتاق
-    # --------------------------------------------
-
-    def get_game(
-        self,
-        game_id: str,
-    ) -> GameRoom:
-
-        if game_id not in self.games:
-            raise ValueError(
-                "اتاق بازی پیدا نشد."
-            )
-
-        return self.games[game_id]
-
-    # --------------------------------------------
-    # اضافه کردن بازیکن
-    # --------------------------------------------
+    def get_game(self, game_id: str) -> Optional[GameRoom]:
+        return self.games.get(game_id)
 
     def add_player(
         self,
         game_id: str,
         player_id: int,
         player_name: str,
-    ) -> Player:
+    ) -> tuple[bool, str]:
 
         game = self.get_game(game_id)
 
-        return game.add_player(
-            player_id,
-            player_name,
+        if not game:
+            return False, "بازی پیدا نشد."
+
+        if game.started:
+            return False, "بازی شروع شده است."
+
+        for player in game.players:
+            if player.id == player_id:
+                return True, "شما قبلاً وارد بازی شده‌اید."
+
+        if len(game.players) >= game.max_players:
+            return False, "ظرفیت بازی تکمیل است."
+
+        game.players.append(
+            Player(
+                id=player_id,
+                name=player_name,
+            )
         )
 
-    # --------------------------------------------
-    # شروع بازی
-    # --------------------------------------------
+        return True, "با موفقیت وارد بازی شدید."
+
+    def remove_player(
+        self,
+        game_id: str,
+        player_id: int,
+    ) -> tuple[bool, str]:
+
+        game = self.get_game(game_id)
+
+        if not game:
+            return False, "بازی پیدا نشد."
+
+        if game.started:
+            return False, "بعد از شروع بازی امکان خروج وجود ندارد."
+
+        if player_id == game.creator_id:
+            return False, "سازنده بازی نمی‌تواند خارج شود."
+
+        before = len(game.players)
+
+        game.players = [
+            player
+            for player in game.players
+            if player.id != player_id
+        ]
+
+        if len(game.players) == before:
+            return False, "شما در این بازی نیستید."
+
+        return True, "از بازی خارج شدید."
 
     def start_game(
         self,
         game_id: str,
-    ) -> GameRoom:
+        player_id: int,
+    ) -> tuple[bool, str]:
 
         game = self.get_game(game_id)
 
-        if game.started:
-            return game
+        if not game:
+            return False, "بازی پیدا نشد."
 
-        if len(game.players) < game.max_players:
-            raise ValueError(
-                "هنوز تعداد بازیکنان کامل نشده است."
+        if player_id != game.creator_id:
+            return False, "فقط سازنده بازی می‌تواند بازی را شروع کند."
+
+        if game.started:
+            return False, "بازی قبلاً شروع شده است."
+
+        if len(game.players) != game.max_players:
+            return (
+                False,
+                f"برای شروع بازی باید {game.max_players} بازیکن حاضر باشند.",
             )
 
         deck = [
@@ -195,325 +191,346 @@ class GameState:
 
         random.shuffle(deck)
 
-        players = list(
-            game.players.values()
-        )
-
-        # پخش کارت
-        for player in players:
+        for player in game.players:
             player.cards.clear()
             player.tricks = 0
 
         for index, card in enumerate(deck):
-            players[
-                index % len(players)
-            ].cards.append(card)
+            player = game.players[index % len(game.players)]
+            player.cards.append(card)
 
-        # حکم
-        hakim = random.choice(players)
+        hakim = random.choice(game.players)
 
         game.hakim_id = hakim.id
-
         game.current_player_id = hakim.id
-
         game.started = True
-
+        game.finished = False
         game.hokm = None
-
+        game.lead_suit = None
         game.current_trick.clear()
+        game.winner_id = None
+        game.team_a_score = 0
+        game.team_b_score = 0
 
-        return game
-
-    # --------------------------------------------
-    # تعیین حکم
-    # --------------------------------------------
+        return True, "بازی شروع شد."
 
     def set_hokm(
         self,
         game_id: str,
         player_id: int,
         suit: str,
-    ) -> GameRoom:
+    ) -> tuple[bool, str]:
 
         game = self.get_game(game_id)
 
+        if not game:
+            return False, "بازی پیدا نشد."
+
         if not game.started:
-            raise ValueError(
-                "بازی هنوز شروع نشده است."
-            )
+            return False, "بازی هنوز شروع نشده است."
+
+        if game.finished:
+            return False, "بازی تمام شده است."
 
         if game.hakim_id != player_id:
-            raise ValueError(
-                "فقط حاکم می‌تواند حکم را تعیین کند."
-            )
+            return False, "فقط حاکم می‌تواند حکم را انتخاب کند."
+
+        if game.hokm:
+            return False, "حکم قبلاً انتخاب شده است."
 
         if suit not in SUITS:
-            raise ValueError(
-                "خال نامعتبر است."
-            )
+            return False, "خال نامعتبر است."
 
         game.hokm = suit
 
-        return game
+        return True, "حکم انتخاب شد."
 
-    # --------------------------------------------
-    # کارت‌های مجاز
-    # --------------------------------------------
+    def get_player(
+        self,
+        game: GameRoom,
+        player_id: int,
+    ) -> Optional[Player]:
+
+        for player in game.players:
+            if player.id == player_id:
+                return player
+
+        return None
 
     def legal_cards(
         self,
-        game_id: str,
+        game: GameRoom,
         player_id: int,
-    ) -> List[Card]:
+    ) -> list[Card]:
 
-        game = self.get_game(game_id)
+        player = self.get_player(game, player_id)
 
-        if player_id not in game.players:
-            raise ValueError(
-                "بازیکن در این اتاق نیست."
-            )
-
-        player = game.players[player_id]
+        if not player:
+            return []
 
         if not game.current_trick:
-            return player.cards
+            return list(player.cards)
 
-        lead_suit = game.current_trick[0]["card"][
-            "suit"
-        ]
+        if not game.lead_suit:
+            return list(player.cards)
 
         same_suit = [
             card
             for card in player.cards
-            if card.suit == lead_suit
+            if card.suit == game.lead_suit
         ]
 
         if same_suit:
             return same_suit
 
-        return player.cards
-
-    # --------------------------------------------
-    # بازی کردن کارت
-    # --------------------------------------------
+        return list(player.cards)
 
     def play_card(
         self,
         game_id: str,
         player_id: int,
         suit: str,
-        rank: str,
-    ) -> GameRoom:
+        rank: int,
+    ) -> tuple[bool, str]:
 
         game = self.get_game(game_id)
 
+        if not game:
+            return False, "بازی پیدا نشد."
+
         if not game.started:
-            raise ValueError(
-                "بازی هنوز شروع نشده است."
-            )
+            return False, "بازی هنوز شروع نشده است."
+
+        if game.finished:
+            return False, "بازی تمام شده است."
 
         if game.hokm is None:
-            raise ValueError(
-                "ابتدا باید حکم مشخص شود."
-            )
+            return False, "ابتدا باید حکم انتخاب شود."
 
         if game.current_player_id != player_id:
-            raise ValueError(
-                "الان نوبت شما نیست."
-            )
+            return False, "الان نوبت شما نیست."
 
-        player = game.players.get(
-            player_id
-        )
+        player = self.get_player(game, player_id)
 
-        if player is None:
-            raise ValueError(
-                "بازیکن پیدا نشد."
-            )
+        if not player:
+            return False, "بازیکن پیدا نشد."
 
-        selected = None
+        selected_card = None
 
         for card in player.cards:
-            if (
-                card.suit == suit
-                and card.rank == rank
-            ):
-                selected = card
+            if card.suit == suit and card.rank == rank:
+                selected_card = card
                 break
 
-        if selected is None:
-            raise ValueError(
-                "این کارت در دست شما نیست."
-            )
+        if selected_card is None:
+            return False, "این کارت در دست شما نیست."
 
         legal = self.legal_cards(
-            game_id,
+            game,
             player_id,
         )
 
         if not any(
-            c.suit == selected.suit
-            and c.rank == selected.rank
-            for c in legal
+            card.suit == selected_card.suit
+            and card.rank == selected_card.rank
+            for card in legal
         ):
-            raise ValueError(
-                "این کارت در این نوبت مجاز نیست."
-            )
+            return False, "باید از خال شروع‌شده پیروی کنید."
 
-        player.cards.remove(selected)
+        player.cards.remove(selected_card)
+
+        if not game.current_trick:
+            game.lead_suit = selected_card.suit
 
         game.current_trick.append(
             {
                 "player_id": player_id,
                 "player_name": player.name,
-                "card": selected.to_dict(),
+                "card": selected_card.to_dict(),
             }
         )
 
-        # هنوز چهار کارت کامل نشده
-        if len(game.current_trick) < len(
-            game.players
-        ):
-            ids = list(game.players.keys())
+        next_index = (
+            game.players.index(player) + 1
+        ) % len(game.players)
 
-            index = ids.index(player_id)
+        if len(game.current_trick) < len(game.players):
 
-            game.current_player_id = ids[
-                (index + 1) % len(ids)
-            ]
+            game.current_player_id = (
+                game.players[next_index].id
+            )
 
-            return game
+            return True, "کارت بازی شد."
 
-        # تعیین برنده دست
-        winner_id = self._trick_winner(
-            game
+        winner = self._trick_winner(game)
+
+        winner_player = self.get_player(
+            game,
+            winner,
         )
 
-        game.players[
-            winner_id
-        ].tricks += 1
+        if winner_player:
+            winner_player.tricks += 1
 
-        game.scores[
-            winner_id
-        ] += 1
+        if winner_player:
+            if game.players.index(winner_player) % 2 == 0:
+                game.team_a_score += 1
+            else:
+                game.team_b_score += 1
 
-        game.current_player_id = winner_id
+        game.current_trick.clear()
+        game.lead_suit = None
 
-        # اگر هنوز کارت دارند، برنده دست بعدی را شروع می‌کند
-        if any(
-            player.cards
-            for player in game.players.values()
-        ):
-            game.current_trick = []
+        cards_left = sum(
+            len(p.cards)
+            for p in game.players
+        )
 
-        else:
-            game.winner_id = winner_id
+        if cards_left == 0:
 
-        return game
+            game.finished = True
+            game.winner_id = winner
 
-    # --------------------------------------------
-    # برنده دست
-    # --------------------------------------------
+            return True, "بازی تمام شد."
+
+        game.current_player_id = winner
+
+        return True, "دست کامل شد."
 
     def _trick_winner(
         self,
         game: GameRoom,
     ) -> int:
 
-        lead_suit = game.current_trick[0][
-            "card"
-        ]["suit"]
+        if not game.current_trick:
+            raise RuntimeError("دست خالی است.")
 
-        rank_value = {
-            rank: index
-            for index, rank in enumerate(
-                RANKS
-            )
-        }
+        best = game.current_trick[0]
 
-        best = None
+        for current in game.current_trick[1:]:
 
-        for item in game.current_trick:
+            best_card = best["card"]
+            current_card = current["card"]
 
-            card = item["card"]
-
-            value = rank_value[
-                card["rank"]
-            ]
-
-            strength = value
-
-            if card["suit"] == lead_suit:
-                strength += 100
-
-            if card["suit"] == game.hokm:
-                strength += 200
-
-            if (
-                best is None
-                or strength > best[0]
+            if self._card_beats(
+                game,
+                current_card,
+                best_card,
             ):
-                best = (
-                    strength,
-                    item["player_id"],
-                )
+                best = current
 
-        return best[1]
+        return best["player_id"]
 
-    # --------------------------------------------
-    # اطلاعات بازی
-    # --------------------------------------------
+    def _card_beats(
+        self,
+        game: GameRoom,
+        current: dict,
+        best: dict,
+    ) -> bool:
+
+        current_suit = current["suit"]
+        current_rank = current["rank"]
+
+        best_suit = best["suit"]
+        best_rank = best["rank"]
+
+        lead = game.lead_suit
+        hokm = game.hokm
+
+        if current_suit == best_suit:
+            return current_rank > best_rank
+
+        if current_suit == hokm and best_suit != hokm:
+            return True
+
+        if best_suit == hokm and current_suit != hokm:
+            return False
+
+        if current_suit == lead and best_suit != lead:
+            return True
+
+        return False
 
     def state_for_player(
         self,
         game_id: str,
         player_id: int,
-    ) -> dict:
+    ) -> Optional[dict]:
 
         game = self.get_game(game_id)
 
-        players = []
+        if not game:
+            return None
 
-        for player in game.players.values():
+        viewer = self.get_player(
+            game,
+            player_id,
+        )
+
+        if not viewer:
+            return None
+
+        players_data = []
+
+        for player in game.players:
 
             cards = []
 
-            # فقط کارت‌های خود بازیکن نمایش داده می‌شود
             if player.id == player_id:
                 cards = [
-                    c.to_dict()
-                    for c in player.cards
+                    card.to_dict()
+                    for card in player.cards
                 ]
 
-            players.append(
+            players_data.append(
                 {
                     "id": player.id,
                     "name": player.name,
                     "cards": cards,
-                    "card_count": len(
-                        player.cards
-                    ),
+                    "card_count": len(player.cards),
                     "tricks": player.tricks,
+                    "is_hakim": player.id == game.hakim_id,
+                    "is_turn": player.id == game.current_player_id,
                 }
             )
 
         return {
             "game_id": game.game_id,
+
+            "viewer_id": player_id,
+
             "creator_id": game.creator_id,
-            "max_players": game.max_players,
+
             "started": game.started,
-            "players": players,
-            "player_count": len(
-                game.players
-            ),
+
+            "finished": game.finished,
+
+            "max_players": game.max_players,
+
+            "player_count": len(game.players),
+
+            "players": players_data,
+
             "hakim_id": game.hakim_id,
+
             "hokm": game.hokm,
-            "current_player_id": (
-                game.current_player_id
-            ),
+
+            "current_player_id": game.current_player_id,
+
+            "lead_suit": game.lead_suit,
+
             "current_trick": game.current_trick,
-            "scores": game.scores,
+
             "winner_id": game.winner_id,
+
+            "team_a_score": game.team_a_score,
+
+            "team_b_score": game.team_b_score,
+
+            "cards_left": sum(
+                len(player.cards)
+                for player in game.players
+            ),
         }
 
 
