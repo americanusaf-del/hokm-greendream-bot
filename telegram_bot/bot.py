@@ -101,30 +101,6 @@ def membership_keyboard() -> InlineKeyboardMarkup:
     )
 
 
-def player_count_keyboard() -> InlineKeyboardMarkup:
-    """Player count selection."""
-    return InlineKeyboardMarkup(
-        [
-            [
-                InlineKeyboardButton(
-                    "👤 ۱ نفر",
-                    callback_data="players_1",
-                ),
-                InlineKeyboardButton(
-                    "👥 ۲ نفر",
-                    callback_data="players_2",
-                ),
-            ],
-            [
-                InlineKeyboardButton(
-                    "👥 ۴ نفر",
-                    callback_data="players_4",
-                )
-            ],
-        ]
-    )
-
-
 def game_keyboard(
     game_id: str,
     creator_id: int,
@@ -291,6 +267,49 @@ async def is_member(
         return True
 
 
+async def create_game_for_message(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    user_id: int,
+    user_name: str,
+) -> None:
+    """Create a game from a normal private chat message."""
+    if update.message is None:
+        return
+
+    member = await is_member(
+        context,
+        user_id,
+    )
+
+    if not member:
+        await update.message.reply_text(
+            "🔒 قبل از ساخت بازی باید در کانال عضو باشی.\n\n"
+            "بعد از عضویت روی «بررسی عضویت» بزن.",
+            reply_markup=membership_keyboard(),
+        )
+        return
+
+    game = game_state.create_game(
+        creator_id=user_id,
+        creator_name=user_name,
+        max_players=1,
+    )
+
+    await update.message.reply_text(
+        "🎮 اتاق بازی ساخته شد!\n\n"
+        f"🆔 کد بازی: `{game.game_id}`\n\n"
+        f"👥 بازیکنان:\n"
+        f"{player_list_text(game)}\n\n"
+        "تعداد بازیکنان را از تنظیمات انتخاب کن.",
+        parse_mode="Markdown",
+        reply_markup=game_keyboard(
+            game.game_id,
+            game.creator_id,
+        ),
+    )
+
+
 async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
@@ -299,6 +318,21 @@ async def start(
     user = update.effective_user
 
     if user is None or update.message is None:
+        return
+
+    # اگر کاربر از دکمه «ساخت اتاق بازی» داخل گروه
+    # وارد ربات شده باشد، این پارامتر دریافت می‌شود.
+    args = context.args or []
+
+    if args and args[0].lower() == "create":
+        await create_game_for_message(
+            update,
+            context,
+            user.id,
+            user.first_name
+            or user.username
+            or "بازیکن",
+        )
         return
 
     text = (
@@ -328,12 +362,19 @@ async def inline_query(
         "برای ساخت یک اتاق بازی روی دکمه زیر بزن."
     )
 
+    # به جای callback_data از لینک مستقیم ربات استفاده می‌کنیم.
+    # این روش در گروه هم کار می‌کند و کاربر را به چت خصوصی
+    # ربات می‌برد تا اتاق برای خودش ساخته شود.
+    create_link = (
+        f"https://t.me/{BOT_USERNAME}?start=create"
+    )
+
     keyboard = InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
                     "🎮 ساخت اتاق بازی",
-                    callback_data="inline_create",
+                    url=create_link,
                 )
             ]
         ]
@@ -912,30 +953,6 @@ async def callback_handler(
             "✅ عضویت تأیید شد.\n\n"
             "حالا می‌توانی بازی بسازی.",
             reply_markup=main_menu_keyboard(),
-        )
-        return
-
-    # مهم:
-    # این دکمه وقتی پیام Inline را داخل گروه می‌فرستی
-    # توسط همان کاربری اجرا می‌شود که روی دکمه کلیک کرده.
-    # بنابراین دیگر به creator_id ذخیره‌شده در Inline Query
-    # وابسته نیست.
-    if data == "inline_create":
-        member = await is_member(
-            context,
-            user.id,
-        )
-
-        if not member:
-            await send_membership_request(query)
-            return
-
-        await create_game(
-            query,
-            user.id,
-            user.first_name
-            or user.username
-            or "بازیکن",
         )
         return
 
