@@ -25,6 +25,11 @@ from telegram.ext import (
 from .config import Settings
 from .game import game_state
 
+
+# =========================================================
+# CONFIG
+# =========================================================
+
 LOGGER = logging.getLogger(__name__)
 
 BOT_USERNAME = "HokmgreendreamBot"
@@ -39,46 +44,56 @@ WEB_APP_URL = os.environ.get(
 ).strip()
 
 
-# ---------------------------------------------------------
-# Temporary inline-room storage
-# ---------------------------------------------------------
+# =========================================================
+# TEMPORARY INLINE DATA
+# =========================================================
 
-# user_id -> game_id
+# User ID -> Game ID
 PENDING_INLINE_GAMES: dict[int, str] = {}
 
-# game_id -> inline_message_id
+# Game ID -> Telegram inline message ID
 INLINE_GAME_MESSAGES: dict[str, str] = {}
 
 
-# ---------------------------------------------------------
-# General helpers
-# ---------------------------------------------------------
+# =========================================================
+# BASIC HELPERS
+# =========================================================
 
+def get_user_name(user) -> str:
+    """Return a readable Telegram name."""
 
-def user_name(user) -> str:
-    """Return a readable Telegram user name."""
     if user.username:
         return f"@{user.username}"
 
     full_name = " ".join(
         part
-        for part in [user.first_name, user.last_name]
+        for part in [
+            user.first_name,
+            user.last_name,
+        ]
         if part
     ).strip()
 
     return full_name or str(user.id)
 
 
-def game_link(action: str, game_id: str) -> str:
-    """Build a Telegram deep link."""
-    return f"https://t.me/{BOT_USERNAME}?start={action}_{game_id}"
+def make_deep_link(
+    action: str,
+    game_id: str,
+) -> str:
+    """Create a Telegram bot deep link."""
+
+    return (
+        f"https://t.me/{BOT_USERNAME}"
+        f"?start={action}_{game_id}"
+    )
 
 
 async def is_member(
     context: ContextTypes.DEFAULT_TYPE,
     user_id: int,
 ) -> bool:
-    """Check required channel membership."""
+    """Check membership in the required channel."""
 
     try:
         member = await context.bot.get_chat_member(
@@ -98,18 +113,17 @@ async def is_member(
             user_id,
         )
 
-        # Do not completely block the game if Telegram
-        # temporarily refuses the membership lookup.
+        # If Telegram temporarily blocks the check,
+        # do not completely prevent the game.
         return True
 
 
-# ---------------------------------------------------------
-# Main menu
-# ---------------------------------------------------------
-
+# =========================================================
+# MAIN MENU
+# =========================================================
 
 def main_menu_keyboard() -> InlineKeyboardMarkup:
-    """Main private-chat keyboard."""
+    """Main private bot menu."""
 
     return InlineKeyboardMarkup(
         [
@@ -137,16 +151,14 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
     )
 
 
-# ---------------------------------------------------------
-# Private game keyboard
-# ---------------------------------------------------------
-
+# =========================================================
+# PRIVATE GAME KEYBOARD
+# =========================================================
 
 def private_game_keyboard(
     game_id: str,
-    creator_id: int,
 ) -> InlineKeyboardMarkup:
-    """Keyboard used inside private bot chat."""
+    """Keyboard used in private chat."""
 
     return InlineKeyboardMarkup(
         [
@@ -154,7 +166,10 @@ def private_game_keyboard(
                 InlineKeyboardButton(
                     "🎮 ورود به میز بازی",
                     web_app=WebAppInfo(
-                        url=f"{WEB_APP_URL}/?game={game_id}",
+                        url=(
+                            f"{WEB_APP_URL}"
+                            f"/?game={game_id}"
+                        ),
                     ),
                 )
             ],
@@ -170,7 +185,7 @@ def private_game_keyboard(
             ],
             [
                 InlineKeyboardButton(
-                    "🔄 بروزرسانی اتاق",
+                    "🔄 بروزرسانی",
                     callback_data=f"refresh:{game_id}",
                 )
             ],
@@ -181,23 +196,23 @@ def private_game_keyboard(
 def settings_keyboard(
     game_id: str,
 ) -> InlineKeyboardMarkup:
-    """Game settings keyboard."""
+    """Game settings."""
 
     return InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
-                    "👤 بازی ۱ نفره",
+                    "👤 ۱ نفره",
                     callback_data=f"players:{game_id}:1",
                 ),
                 InlineKeyboardButton(
-                    "👥 بازی ۲ نفره",
+                    "👥 ۲ نفره",
                     callback_data=f"players:{game_id}:2",
                 ),
             ],
             [
                 InlineKeyboardButton(
-                    "👥👥 بازی ۴ نفره",
+                    "👥👥 ۴ نفره",
                     callback_data=f"players:{game_id}:4",
                 )
             ],
@@ -214,7 +229,7 @@ def settings_keyboard(
 def suit_keyboard(
     game_id: str,
 ) -> InlineKeyboardMarkup:
-    """Hokm suit selection keyboard."""
+    """Hokm suit selection."""
 
     return InlineKeyboardMarkup(
         [
@@ -242,68 +257,74 @@ def suit_keyboard(
     )
 
 
-# ---------------------------------------------------------
-# Group inline-room keyboard
-# ---------------------------------------------------------
-
+# =========================================================
+# GROUP ROOM KEYBOARD
+# =========================================================
 
 def group_room_keyboard(
     game_id: str,
 ) -> InlineKeyboardMarkup:
     """
-    Keyboard displayed directly inside the group.
+    Keyboard shown directly inside the group.
 
-    Joining happens through a Telegram deep-link to the bot.
-    The actual room remains visible in the group.
+    The buttons use Telegram deep links so users can
+    join the same game safely.
     """
+
+    join_url = make_deep_link(
+        "join",
+        game_id,
+    )
+
+    play_url = make_deep_link(
+        "play",
+        game_id,
+    )
+
+    settings_url = make_deep_link(
+        "settings",
+        game_id,
+    )
+
+    start_url = make_deep_link(
+        "start",
+        game_id,
+    )
 
     return InlineKeyboardMarkup(
         [
             [
                 InlineKeyboardButton(
                     "➕ ورود به بازی",
-                    url=game_link(
-                        "join",
-                        game_id,
-                    ),
+                    url=join_url,
                 )
             ],
             [
                 InlineKeyboardButton(
                     "🎮 ورود به میز بازی",
-                    url=game_link(
-                        "play",
-                        game_id,
-                    ),
+                    url=play_url,
                 )
             ],
             [
                 InlineKeyboardButton(
                     "⚙️ تنظیمات",
-                    url=game_link(
-                        "settings",
-                        game_id,
-                    ),
-                    ),
+                    url=settings_url,
+                ),
                 InlineKeyboardButton(
                     "▶️ شروع بازی",
-                    url=game_link(
-                        "start",
-                        game_id,
-                    ),
+                    url=start_url,
                 ),
             ],
         ]
     )
 
 
-# ---------------------------------------------------------
-# Game text
-# ---------------------------------------------------------
-
+# =========================================================
+# GAME ROOM TEXT
+# =========================================================
 
 def room_text(game) -> str:
-    """Create the group/private room text."""
+    """Build room message."""
 
     players = list(game.players.values())
 
@@ -315,83 +336,88 @@ def room_text(game) -> str:
     else:
         player_lines = "• هنوز بازیکنی وارد نشده است"
 
-    status = (
-        "🟢 بازی شروع شده"
-        if game.started
-        else "🟡 منتظر بازیکنان"
+    if game.started:
+        status = "🟢 بازی شروع شده"
+    else:
+        status = "🟡 منتظر بازیکنان"
+
+    hokm = getattr(
+        game,
+        "hokm",
+        None,
     )
 
-    hokm_text = (
-        game.hokm
-        if getattr(game, "hokm", None)
-        else "هنوز انتخاب نشده"
-    )
+    hokm_text = hokm if hokm else "انتخاب نشده"
 
     return (
-        "🎴 *اتاق بازی حکم Green Dream*\n\n"
-        f"🆔 اتاق: `{game.game_id}`\n"
+        "🎴 *اتاق حکم Green Dream*\n\n"
+        f"🆔 کد اتاق: `{game.game_id}`\n"
         f"👥 ظرفیت: {game.max_players} نفر\n"
         f"📊 وضعیت: {status}\n"
         f"👑 حکم: {hokm_text}\n\n"
         "👤 *بازیکنان:*\n"
         f"{player_lines}\n\n"
-        "برای ورود به بازی روی دکمه «➕ ورود به بازی» بزنید."
+        "برای ورود به این بازی روی "
+        "«➕ ورود به بازی» بزنید."
     )
 
 
-# ---------------------------------------------------------
-# Update inline room message
-# ---------------------------------------------------------
-
+# =========================================================
+# UPDATE GROUP ROOM
+# =========================================================
 
 async def update_group_room(
     context: ContextTypes.DEFAULT_TYPE,
     game_id: str,
 ) -> None:
-    """Update the inline room message in the group."""
+    """Update the room message inside the group."""
 
-    inline_message_id = INLINE_GAME_MESSAGES.get(game_id)
+    inline_message_id = INLINE_GAME_MESSAGES.get(
+        game_id
+    )
 
     if not inline_message_id:
         return
 
+    game = game_state.get_game(
+        game_id
+    )
+
+    if game is None:
+        return
+
     try:
-        game = game_state.get_game(game_id)
-
-        if game is None:
-            return
-
         await context.bot.edit_message_text(
             inline_message_id=inline_message_id,
             text=room_text(game),
             parse_mode="Markdown",
             reply_markup=group_room_keyboard(
-                game_id,
+                game_id
             ),
         )
 
     except Exception:
         LOGGER.exception(
-            "Could not update inline room %s",
+            "Failed to update group room %s",
             game_id,
         )
 
 
-# ---------------------------------------------------------
-# /start
-# ---------------------------------------------------------
-
+# =========================================================
+# /START
+# =========================================================
 
 async def start(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
-    """Handle /start and Telegram deep links."""
+    """Handle /start and deep links."""
 
     if not update.effective_user:
         return
 
     user = update.effective_user
+    message = update.effective_message
     args = context.args or []
 
     # -----------------------------------------------------
@@ -399,10 +425,10 @@ async def start(
     # -----------------------------------------------------
 
     if not args:
-        await update.effective_message.reply_text(
+        await message.reply_text(
             "🎴 سلام!\n\n"
-            "به Green Dream Hokm خوش آمدی.\n"
-            "برای شروع یک بازی بساز یا وارد میز بازی شو.",
+            "به Green Dream Hokm خوش آمدی.\n\n"
+            "برای شروع بازی یکی از گزینه‌های زیر را انتخاب کن.",
             reply_markup=main_menu_keyboard(),
         )
         return
@@ -414,41 +440,28 @@ async def start(
     # -----------------------------------------------------
 
     if parameter == "create":
-        if not await is_member(
-            context,
-            user.id,
-        ):
-            await update.effective_message.reply_text(
-                "⛔ برای بازی ابتدا باید عضو کانال ما شوی:\n\n"
-                f"{CHANNEL_LINK}\n\n"
-                "بعد دوباره تلاش کن."
-            )
-            return
-
         game = game_state.create_game(
             creator_id=user.id,
-            creator_name=user_name(user),
+            creator_name=get_user_name(user),
             max_players=4,
         )
 
-        await update.effective_message.reply_text(
+        await message.reply_text(
             room_text(game),
             parse_mode="Markdown",
             reply_markup=private_game_keyboard(
-                game.game_id,
-                user.id,
+                game.game_id
             ),
         )
         return
 
     # -----------------------------------------------------
-    # Deep-link parser
+    # Deep link format
     # -----------------------------------------------------
 
     if "_" not in parameter:
-        await update.effective_message.reply_text(
-            "❌ لینک بازی معتبر نیست.",
-            reply_markup=main_menu_keyboard(),
+        await message.reply_text(
+            "❌ لینک بازی معتبر نیست."
         )
         return
 
@@ -457,17 +470,19 @@ async def start(
         1,
     )
 
-    game = game_state.get_game(game_id)
+    game = game_state.get_game(
+        game_id
+    )
 
     if game is None:
-        await update.effective_message.reply_text(
+        await message.reply_text(
             "❌ این اتاق بازی دیگر وجود ندارد."
         )
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # JOIN
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "join":
 
@@ -475,15 +490,15 @@ async def start(
             context,
             user.id,
         ):
-            await update.effective_message.reply_text(
-                "⛔ برای ورود به بازی باید عضو کانال باشی:\n\n"
+            await message.reply_text(
+                "⛔ برای ورود به بازی ابتدا باید عضو کانال شوی:\n\n"
                 f"{CHANNEL_LINK}\n\n"
-                "بعد از عضویت دوباره روی «ورود به بازی» بزن."
+                "بعد دوباره روی ورود به بازی بزن."
             )
             return
 
         if game.started:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "⛔ این بازی قبلاً شروع شده است."
             )
             return
@@ -493,10 +508,10 @@ async def start(
                 game_state.add_player(
                     game_id,
                     user.id,
-                    user_name(user),
+                    get_user_name(user),
                 )
             except Exception as exc:
-                await update.effective_message.reply_text(
+                await message.reply_text(
                     f"❌ ورود به بازی انجام نشد:\n{exc}"
                 )
                 return
@@ -506,32 +521,33 @@ async def start(
             game_id,
         )
 
-        await update.effective_message.reply_text(
-            "✅ با موفقیت وارد اتاق شدی!\n\n"
-            f"🎴 اتاق: {game_id}\n"
-            f"👥 بازیکنان: {len(game.players)}/{game.max_players}",
+        await message.reply_text(
+            "✅ با موفقیت وارد بازی شدی!\n\n"
+            f"🎴 کد اتاق: {game_id}\n"
+            f"👥 بازیکنان: "
+            f"{len(game.players)}/{game.max_players}",
             reply_markup=private_game_keyboard(
-                game_id,
-                game.creator_id,
+                game_id
             ),
         )
+
         return
 
-    # -----------------------------------------------------
-    # PLAY / MINI APP
-    # -----------------------------------------------------
+    # =====================================================
+    # PLAY
+    # =====================================================
 
     if action == "play":
 
         if user.id not in game.players:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "⛔ ابتدا باید وارد بازی شوی.",
                 reply_markup=InlineKeyboardMarkup(
                     [
                         [
                             InlineKeyboardButton(
                                 "➕ ورود به بازی",
-                                url=game_link(
+                                url=make_deep_link(
                                     "join",
                                     game_id,
                                 ),
@@ -542,82 +558,85 @@ async def start(
             )
             return
 
-        await update.effective_message.reply_text(
+        await message.reply_text(
             "🎮 میز بازی آماده است.\n\n"
-            "روی دکمه زیر بزن تا وارد میز حکم شوی.",
+            "روی دکمه زیر بزن:",
             reply_markup=InlineKeyboardMarkup(
                 [
                     [
                         InlineKeyboardButton(
                             "🎮 ورود به میز بازی",
                             web_app=WebAppInfo(
-                                url=f"{WEB_APP_URL}/?game={game_id}",
+                                url=(
+                                    f"{WEB_APP_URL}"
+                                    f"/?game={game_id}"
+                                ),
                             ),
                         )
                     ]
                 ]
             ),
         )
+
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # SETTINGS
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "settings":
 
         if user.id != game.creator_id:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "⛔ فقط سازنده اتاق می‌تواند تنظیمات را تغییر دهد."
             )
             return
 
-        await update.effective_message.reply_text(
+        await message.reply_text(
             "⚙️ تنظیمات بازی\n\n"
             "تعداد بازیکنان را انتخاب کن:",
             reply_markup=settings_keyboard(
-                game_id,
+                game_id
             ),
         )
+
         return
 
-    # -----------------------------------------------------
-    # START
-    # -----------------------------------------------------
+    # =====================================================
+    # START GAME
+    # =====================================================
 
     if action == "start":
 
         if user.id != game.creator_id:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "⛔ فقط سازنده اتاق می‌تواند بازی را شروع کند."
             )
             return
 
         if game.started:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "🟢 بازی قبلاً شروع شده است.",
                 reply_markup=private_game_keyboard(
-                    game_id,
-                    game.creator_id,
+                    game_id
                 ),
             )
             return
 
         if len(game.players) < game.max_players:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "⏳ هنوز بازیکنان کامل نشده‌اند.\n\n"
-                f"👥 بازیکنان فعلی: "
-                f"{len(game.players)}/{game.max_players}\n\n"
-                "لینک اتاق را در گروه نگه دارید تا بازیکنان وارد شوند."
+                f"👥 بازیکنان: "
+                f"{len(game.players)}/{game.max_players}"
             )
             return
 
         try:
             game_state.start_game(
-                game_id,
+                game_id
             )
         except Exception as exc:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 f"❌ شروع بازی انجام نشد:\n{exc}"
             )
             return
@@ -627,79 +646,76 @@ async def start(
             game_id,
         )
 
-        # If the creator is hakim, ask for hokm.
         if game.hakim_id == user.id:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "👑 تو حاکم شدی!\n\n"
                 "خال حکم را انتخاب کن:",
                 reply_markup=suit_keyboard(
-                    game_id,
+                    game_id
                 ),
             )
         else:
-            await update.effective_message.reply_text(
+            await message.reply_text(
                 "🟢 بازی شروع شد.",
                 reply_markup=private_game_keyboard(
-                    game_id,
-                    game.creator_id,
+                    game_id
                 ),
             )
 
         return
 
-    # -----------------------------------------------------
-    # Unknown action
-    # -----------------------------------------------------
-
-    await update.effective_message.reply_text(
+    await message.reply_text(
         "❌ عملیات ناشناخته است."
     )
 
 
-# ---------------------------------------------------------
-# Inline query
-# ---------------------------------------------------------
-
+# =========================================================
+# INLINE QUERY
+# =========================================================
 
 async def inline_query(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
     """
-    Create a game room when the creator selects
-    the inline result.
+    Create an inline game room.
 
-    The room message itself is posted directly
-    into the current group.
+    The room is posted directly into the group
+    when the user selects the result.
     """
 
     query = update.inline_query
 
-    if not query:
+    if query is None:
         return
 
     user = query.from_user
 
+    game = None
+
+    # Reuse an existing pending room for this creator.
     existing_game_id = PENDING_INLINE_GAMES.get(
         user.id
     )
 
-    game = None
-
     if existing_game_id:
-        game = game_state.get_game(
+        existing_game = game_state.get_game(
             existing_game_id
         )
 
-        if game and not game.started:
-            if game.creator_id != user.id:
-                game = None
+        if (
+            existing_game is not None
+            and not existing_game.started
+            and existing_game.creator_id == user.id
+        ):
+            game = existing_game
 
+    # Create a new room if necessary.
     if game is None:
         try:
             game = game_state.create_game(
                 creator_id=user.id,
-                creator_name=user_name(user),
+                creator_name=get_user_name(user),
                 max_players=4,
             )
 
@@ -709,7 +725,7 @@ async def inline_query(
 
         except Exception:
             LOGGER.exception(
-                "Could not create inline game"
+                "Could not create inline game."
             )
 
             await query.answer(
@@ -722,15 +738,13 @@ async def inline_query(
     result = InlineQueryResultArticle(
         id=f"hokm-room-{game.game_id}",
         title="🎮 ساخت اتاق بازی حکم",
-        description=(
-            "اتاق را مستقیماً داخل همین گروه ایجاد کن"
-        ),
+        description="ساخت اتاق مستقیماً داخل همین گروه",
         input_message_content=InputTextMessageContent(
             room_text(game),
             parse_mode="Markdown",
         ),
         reply_markup=group_room_keyboard(
-            game.game_id,
+            game.game_id
         ),
     )
 
@@ -741,23 +755,22 @@ async def inline_query(
     )
 
 
-# ---------------------------------------------------------
-# Chosen inline result
-# ---------------------------------------------------------
-
+# =========================================================
+# CHOSEN INLINE RESULT
+# =========================================================
 
 async def chosen_inline_result(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
     """
-    Save the inline_message_id after the room
-    has actually been posted in the group.
+    Remember the inline message ID after
+    the room is posted in the group.
     """
 
     chosen = update.chosen_inline_result
 
-    if not chosen:
+    if chosen is None:
         return
 
     result_id = chosen.result_id
@@ -775,26 +788,24 @@ async def chosen_inline_result(
         )
 
         LOGGER.info(
-            "Inline room %s posted as %s",
+            "Saved inline message for game %s",
             game_id,
-            chosen.inline_message_id,
         )
 
 
-# ---------------------------------------------------------
-# Callback queries
-# ---------------------------------------------------------
-
+# =========================================================
+# CALLBACK QUERY
+# =========================================================
 
 async def callback_query(
     update: Update,
     context: ContextTypes.DEFAULT_TYPE,
 ) -> None:
-    """Handle private-chat callback buttons."""
+    """Handle private bot buttons."""
 
     query = update.callback_query
 
-    if not query:
+    if query is None:
         return
 
     await query.answer()
@@ -802,14 +813,14 @@ async def callback_query(
     user = query.from_user
     data = query.data or ""
 
-    # -----------------------------------------------------
+    # =====================================================
     # HELP
-    # -----------------------------------------------------
+    # =====================================================
 
     if data == "help":
         await query.edit_message_text(
             "❓ *راهنمای Green Dream Hokm*\n\n"
-            "1️⃣ بازی را بساز.\n"
+            "1️⃣ اتاق بازی را بساز.\n"
             "2️⃣ بازیکنان وارد اتاق شوند.\n"
             "3️⃣ سازنده بازی را شروع کند.\n"
             "4️⃣ حاکم خال حکم را انتخاب کند.\n"
@@ -828,9 +839,9 @@ async def callback_query(
         )
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # HOME
-    # -----------------------------------------------------
+    # =====================================================
 
     if data == "home":
         await query.edit_message_text(
@@ -840,9 +851,9 @@ async def callback_query(
         )
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # CREATE GAME
-    # -----------------------------------------------------
+    # =====================================================
 
     if data == "create_game":
 
@@ -851,8 +862,7 @@ async def callback_query(
             user.id,
         ):
             await query.edit_message_text(
-                "⛔ ابتدا باید عضو کانال شوی:\n\n"
-                f"{CHANNEL_LINK}",
+                "⛔ ابتدا باید عضو کانال شوی:",
                 reply_markup=InlineKeyboardMarkup(
                     [
                         [
@@ -866,7 +876,7 @@ async def callback_query(
                                 "📢 کانال دوم",
                                 url=SECOND_CHANNEL_LINK,
                             )
-                        ]
+                        ],
                     ]
                 ),
             )
@@ -874,7 +884,7 @@ async def callback_query(
 
         game = game_state.create_game(
             creator_id=user.id,
-            creator_name=user_name(user),
+            creator_name=get_user_name(user),
             max_players=4,
         )
 
@@ -882,15 +892,15 @@ async def callback_query(
             room_text(game),
             parse_mode="Markdown",
             reply_markup=private_game_keyboard(
-                game.game_id,
-                user.id,
+                game.game_id
             ),
         )
+
         return
 
-    # -----------------------------------------------------
-    # Everything below uses game_id
-    # -----------------------------------------------------
+    # =====================================================
+    # GAME CALLBACKS
+    # =====================================================
 
     parts = data.split(":")
 
@@ -910,25 +920,23 @@ async def callback_query(
         )
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # REFRESH
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "refresh":
-
         await query.edit_message_text(
             room_text(game),
             parse_mode="Markdown",
             reply_markup=private_game_keyboard(
-                game_id,
-                game.creator_id,
+                game_id
             ),
         )
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # SETTINGS
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "settings":
 
@@ -943,14 +951,15 @@ async def callback_query(
             "⚙️ تنظیمات بازی\n\n"
             "تعداد بازیکنان را انتخاب کن:",
             reply_markup=settings_keyboard(
-                game_id,
+                game_id
             ),
         )
+
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # PLAYER COUNT
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "players":
 
@@ -974,7 +983,7 @@ async def callback_query(
 
         if game.started:
             await query.answer(
-                "⛔ بازی شروع شده و تنظیمات قفل است.",
+                "⛔ بازی شروع شده است.",
                 show_alert=True,
             )
             return
@@ -985,8 +994,7 @@ async def callback_query(
             room_text(game),
             parse_mode="Markdown",
             reply_markup=private_game_keyboard(
-                game_id,
-                game.creator_id,
+                game_id
             ),
         )
 
@@ -997,9 +1005,9 @@ async def callback_query(
 
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # BACK
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "back":
 
@@ -1007,15 +1015,15 @@ async def callback_query(
             room_text(game),
             parse_mode="Markdown",
             reply_markup=private_game_keyboard(
-                game_id,
-                game.creator_id,
+                game_id
             ),
         )
+
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # START
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "start":
 
@@ -1035,8 +1043,10 @@ async def callback_query(
 
         if len(game.players) < game.max_players:
             await query.answer(
-                f"هنوز بازیکنان کامل نیستند: "
-                f"{len(game.players)}/{game.max_players}",
+                (
+                    f"بازیکنان کامل نیستند: "
+                    f"{len(game.players)}/{game.max_players}"
+                ),
                 show_alert=True,
             )
             return
@@ -1062,23 +1072,22 @@ async def callback_query(
                 "👑 تو حاکم شدی!\n\n"
                 "خال حکم را انتخاب کن:",
                 reply_markup=suit_keyboard(
-                    game_id,
+                    game_id
                 ),
             )
         else:
             await query.edit_message_text(
                 "🟢 بازی شروع شد.",
                 reply_markup=private_game_keyboard(
-                    game_id,
-                    game.creator_id,
+                    game_id
                 ),
             )
 
         return
 
-    # -----------------------------------------------------
+    # =====================================================
     # HOKM
-    # -----------------------------------------------------
+    # =====================================================
 
     if action == "hokm":
 
@@ -1120,20 +1129,23 @@ async def callback_query(
                         InlineKeyboardButton(
                             "🎮 ورود به میز بازی",
                             web_app=WebAppInfo(
-                                url=f"{WEB_APP_URL}/?game={game_id}",
+                                url=(
+                                    f"{WEB_APP_URL}"
+                                    f"/?game={game_id}"
+                                ),
                             ),
-                        ]
+                        )
                     ]
                 ]
             ),
         )
+
         return
 
 
-# ---------------------------------------------------------
-# Error handler
-# ---------------------------------------------------------
-
+# =========================================================
+# ERROR HANDLER
+# =========================================================
 
 async def error_handler(
     update: object,
@@ -1141,19 +1153,19 @@ async def error_handler(
 ) -> None:
     """Log unexpected errors."""
 
-    LOGGER.exception(
-        "Unhandled bot error",
+    LOGGER.error(
+        "Unhandled exception: %s",
+        context.error,
         exc_info=context.error,
     )
 
 
-# ---------------------------------------------------------
-# Run bot
-# ---------------------------------------------------------
-
+# =========================================================
+# RUN
+# =========================================================
 
 def run() -> None:
-    """Start Telegram polling."""
+    """Start the Telegram bot."""
 
     settings = Settings.from_environment()
 
@@ -1173,6 +1185,7 @@ def run() -> None:
         .build()
     )
 
+    # /start
     application.add_handler(
         CommandHandler(
             "start",
@@ -1180,18 +1193,22 @@ def run() -> None:
         )
     )
 
+    # Inline mode
     application.add_handler(
         InlineQueryHandler(
             inline_query,
         )
     )
 
+    # Detect when an inline room is actually
+    # posted into a group.
     application.add_handler(
         ChosenInlineResultHandler(
             chosen_inline_result,
         )
     )
 
+    # Private buttons
     application.add_handler(
         CallbackQueryHandler(
             callback_query,
