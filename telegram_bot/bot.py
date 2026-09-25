@@ -33,11 +33,10 @@ CHANNEL_USERNAME = "@greendreamze"
 CHANNEL_LINK = "https://t.me/greendreamze"
 SECOND_CHANNEL_LINK = "https://t.me/+CkjlXmCqFaM2M2Jk"
 
-# آدرس Mini App از Environment گرفته می‌شود.
-# بعداً در Replit/Render مقدار واقعی را قرار می‌دهیم.
+# آدرس اصلی Mini App
 WEB_APP_URL = os.environ.get(
     "WEB_APP_URL",
-    "https://example.com",
+    "https://hokm-greendream-bot.onrender.com",
 ).strip()
 
 
@@ -53,6 +52,14 @@ def main_menu_keyboard() -> InlineKeyboardMarkup:
     """Main menu."""
     return InlineKeyboardMarkup(
         [
+            [
+                InlineKeyboardButton(
+                    "🎮 ورود به Green Dream",
+                    web_app=WebAppInfo(
+                        url=WEB_APP_URL,
+                    ),
+                )
+            ],
             [
                 InlineKeyboardButton(
                     "🎮 ساخت بازی",
@@ -142,8 +149,7 @@ def game_keyboard(game_id: str, creator_id: int) -> InlineKeyboardMarkup:
         ],
     ]
 
-    # لینک ورود به Mini App
-    if WEB_APP_URL and "example.com" not in WEB_APP_URL:
+    if WEB_APP_URL:
         rows.insert(
             0,
             [
@@ -185,7 +191,6 @@ def card_keyboard(
 ) -> InlineKeyboardMarkup:
     """Cards keyboard."""
     rows = []
-
     row = []
 
     for index, card in enumerate(cards):
@@ -240,10 +245,7 @@ def player_list_text(game) -> str:
 
     for index, player in enumerate(game.players.values(), start=1):
         marker = " 👑" if player.user_id == game.creator_id else ""
-
-        lines.append(
-            f"{index}. {player.name}{marker}"
-        )
+        lines.append(f"{index}. {player.name}{marker}")
 
     if not lines:
         return "هنوز بازیکنی وارد نشده است."
@@ -273,9 +275,6 @@ async def is_member(
             "Membership check failed for user %s",
             user_id,
         )
-
-        # فعلاً برای جلوگیری از گیر کردن ربات
-        # در صورت مشکل Telegram API اجازه ادامه می‌دهیم.
         return True
 
 
@@ -292,7 +291,7 @@ async def start(
     text = (
         "🃏 سلام!\n\n"
         "به ربات حکم Green Dream خوش آمدی 🌿\n\n"
-        "از منوی زیر شروع کن:"
+        "🎮 برای ورود به میز بازی روی دکمه زیر بزن."
     )
 
     await update.message.reply_text(
@@ -333,9 +332,7 @@ async def inline_query(
         id="hokm-room",
         title="🎮 ساخت اتاق حکم",
         description="ساخت اتاق جدید حکم",
-        input_message_content=InputTextMessageContent(
-            text,
-        ),
+        input_message_content=InputTextMessageContent(text),
         reply_markup=keyboard,
     )
 
@@ -346,9 +343,7 @@ async def inline_query(
     )
 
 
-async def send_membership_request(
-    query,
-) -> None:
+async def send_membership_request(query) -> None:
     """Show membership requirement."""
     await query.edit_message_text(
         "🔒 قبل از شروع بازی باید در کانال عضو باشی.\n\n"
@@ -382,10 +377,7 @@ async def create_game(
     )
 
 
-async def show_room(
-    query,
-    game_id: str,
-) -> None:
+async def show_room(query, game_id: str) -> None:
     """Show game room."""
     game = game_state.get_game(game_id)
 
@@ -524,16 +516,14 @@ async def set_players(
         )
         return
 
-    game.max_players = count
-
-    # اگر تعداد قبلی بیشتر از مقدار جدید است،
-    # فعلاً اجازه تغییر نمی‌دهیم.
     if len(game.players) > count:
         await query.answer(
             "تعداد بازیکنان فعلی بیشتر از این مقدار است.",
             show_alert=True,
         )
         return
+
+    game.max_players = count
 
     await query.edit_message_text(
         "⚙️ تنظیمات ذخیره شد.\n\n"
@@ -588,10 +578,7 @@ async def join_game(
         show_alert=True,
     )
 
-    await show_room(
-        query,
-        game_id,
-    )
+    await show_room(query, game_id)
 
 
 async def start_game(
@@ -620,8 +607,7 @@ async def start_game(
 
     if result == "wrong_count":
         await query.answer(
-            f"برای شروع باید دقیقاً {game.max_players} "
-            "بازیکن داخل اتاق باشد.",
+            f"برای شروع باید دقیقاً {game.max_players} بازیکن داخل اتاق باشد.",
             show_alert=True,
         )
         return
@@ -645,7 +631,6 @@ async def start_game(
     if game is None:
         return
 
-    # اگر حکم هنوز انتخاب نشده و حکیم مشخص است
     if game.hokm is None and game.hakim_id == user_id:
         await query.edit_message_text(
             "🃏 بازی شروع شد!\n\n"
@@ -655,7 +640,6 @@ async def start_game(
         )
         return
 
-    # اگر حکیم شخص دیگری است
     await query.edit_message_text(
         "🃏 بازی شروع شد!\n\n"
         "منتظر انتخاب خال حکم توسط حکیم بمان.",
@@ -673,10 +657,7 @@ async def show_hand(
     if game is None:
         return
 
-    cards = game_state.get_hand(
-        game_id,
-        user_id,
-    )
+    cards = game_state.get_hand(game_id, user_id)
 
     if not cards:
         await context.bot.send_message(
@@ -687,14 +668,8 @@ async def show_hand(
 
     await context.bot.send_message(
         chat_id=user_id,
-        text=(
-            "🃏 کارت‌های تو:\n\n"
-            "برای بازی کردن یک کارت را انتخاب کن."
-        ),
-        reply_markup=card_keyboard(
-            game_id,
-            cards,
-        ),
+        text="🃏 کارت‌های تو:\n\nبرای بازی کردن یک کارت را انتخاب کن.",
+        reply_markup=card_keyboard(game_id, cards),
     )
 
 
@@ -741,9 +716,7 @@ async def select_card(
 
     card = result["card"]
 
-    await query.answer(
-        f"🃏 کارت {card} بازی شد.",
-    )
+    await query.answer(f"🃏 کارت {card} بازی شد.")
 
     if result.get("trick_finished"):
         winner_id = result.get("winner_id")
@@ -764,7 +737,6 @@ async def select_card(
             f"🏆 برنده این دست: {winner_name}\n\n"
             "نوبت نفر برنده است.",
         )
-
         return
 
     await query.edit_message_text(
@@ -798,10 +770,7 @@ async def select_hokm(
     }
 
     await query.answer(
-        messages.get(
-            result,
-            "خطایی رخ داد.",
-        ),
+        messages.get(result, "خطایی رخ داد."),
         show_alert=True,
     )
 
@@ -819,7 +788,6 @@ async def select_hokm(
         "🎮 بازی ادامه دارد.",
     )
 
-    # کارت‌های بازیکن را فقط برای خودش در پیام خصوصی می‌فرستیم.
     for player_id in game.players:
         try:
             await show_hand(
@@ -834,16 +802,14 @@ async def select_hokm(
             )
 
 
-async def help_command(
-    query,
-) -> None:
+async def help_command(query) -> None:
     """Show help."""
     await query.edit_message_text(
         "📖 راهنمای حکم\n\n"
         "🃏 بازی حکم به صورت اتاقی انجام می‌شود.\n\n"
-        "👤 می‌توانی بازی ۱ نفره برای تست داشته باشی.\n"
-        "👥 حالت ۲ نفره نیز وجود دارد.\n"
-        "👥 حالت ۴ نفره نیز وجود دارد.\n\n"
+        "👤 بازی ۱ نفره برای تست\n"
+        "👥 بازی ۲ نفره\n"
+        "👥 بازی ۴ نفره\n\n"
         "🎮 نسخه اصلی بازی در Mini App اجرا خواهد شد.",
         reply_markup=main_menu_keyboard(),
     )
@@ -869,10 +835,7 @@ async def callback_handler(
         return
 
     if data == "create_game":
-        member = await is_member(
-            context,
-            user.id,
-        )
+        member = await is_member(context, user.id)
 
         if not member:
             await send_membership_request(query)
@@ -886,10 +849,7 @@ async def callback_handler(
         return
 
     if data == "check_membership":
-        member = await is_member(
-            context,
-            user.id,
-        )
+        member = await is_member(context, user.id)
 
         if not member:
             await query.answer(
@@ -899,16 +859,13 @@ async def callback_handler(
             return
 
         await query.edit_message_text(
-            "✅ عضویت تأیید شد.\n\n"
-            "حالا می‌توانی بازی بسازی.",
+            "✅ عضویت تأیید شد.\n\nحالا می‌توانی بازی بسازی.",
             reply_markup=main_menu_keyboard(),
         )
         return
 
     if data.startswith("inline_create:"):
-        creator_id = int(
-            data.split(":", 1)[1]
-        )
+        creator_id = int(data.split(":", 1)[1])
 
         if user.id != creator_id:
             await query.answer(
@@ -917,10 +874,7 @@ async def callback_handler(
             )
             return
 
-        member = await is_member(
-            context,
-            user.id,
-        )
+        member = await is_member(context, user.id)
 
         if not member:
             await send_membership_request(query)
@@ -931,9 +885,6 @@ async def callback_handler(
             user.id,
             user.first_name or user.username or "بازیکن",
         )
-        return
-
-    if data.startswith("players:"):
         return
 
     if data.startswith("setplayers:"):
@@ -948,7 +899,6 @@ async def callback_handler(
 
     if data.startswith("choose_players:"):
         _, game_id = data.split(":", 1)
-
         await choose_players(
             query,
             game_id,
@@ -958,7 +908,6 @@ async def callback_handler(
 
     if data.startswith("settings:"):
         _, game_id = data.split(":", 1)
-
         await show_settings(
             query,
             game_id,
@@ -968,16 +917,11 @@ async def callback_handler(
 
     if data.startswith("back_room:"):
         _, game_id = data.split(":", 1)
-
-        await show_room(
-            query,
-            game_id,
-        )
+        await show_room(query, game_id)
         return
 
     if data.startswith("join:"):
         _, game_id = data.split(":", 1)
-
         await join_game(
             query,
             game_id,
@@ -988,7 +932,6 @@ async def callback_handler(
 
     if data.startswith("start:"):
         _, game_id = data.split(":", 1)
-
         await start_game(
             query,
             game_id,
@@ -998,7 +941,6 @@ async def callback_handler(
 
     if data.startswith("card:"):
         _, game_id, index_text = data.split(":")
-
         await select_card(
             query,
             game_id,
@@ -1009,7 +951,6 @@ async def callback_handler(
 
     if data.startswith("hokm:"):
         _, game_id, suit = data.split(":", 2)
-
         await select_hokm(
             query,
             game_id,
@@ -1030,9 +971,7 @@ async def error_handler(
     )
 
 
-def build_application(
-    settings: Settings,
-) -> Application:
+def build_application(settings: Settings) -> Application:
     """Build Telegram application."""
     application = (
         Application.builder()
@@ -1041,27 +980,18 @@ def build_application(
     )
 
     application.add_handler(
-        CommandHandler(
-            "start",
-            start,
-        )
+        CommandHandler("start", start)
     )
 
     application.add_handler(
-        InlineQueryHandler(
-            inline_query,
-        )
+        InlineQueryHandler(inline_query)
     )
 
     application.add_handler(
-        CallbackQueryHandler(
-            callback_handler,
-        )
+        CallbackQueryHandler(callback_handler)
     )
 
-    application.add_error_handler(
-        error_handler,
-    )
+    application.add_error_handler(error_handler)
 
     return application
 
@@ -1075,8 +1005,6 @@ def run() -> None:
         ),
         level=logging.INFO,
     )
-
-    from .config import Settings
 
     settings = Settings.from_environment()
 
