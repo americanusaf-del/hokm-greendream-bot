@@ -7,7 +7,7 @@ import os
 import time
 from urllib.parse import parse_qsl
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 
 from telegram_bot.game import game_state
 
@@ -23,21 +23,33 @@ def validate_telegram_data(init_data: str):
         return None
 
     try:
-        parsed = dict(parse_qsl(init_data, keep_blank_values=True))
+        parsed = dict(
+            parse_qsl(
+                init_data,
+                keep_blank_values=True,
+            )
+        )
 
         received_hash = parsed.pop("hash", None)
 
         if not received_hash:
             return None
 
-        auth_date = int(parsed.get("auth_date", "0"))
+        auth_date = int(
+            parsed.get(
+                "auth_date",
+                "0",
+            )
+        )
 
         if time.time() - auth_date > 86400:
             return None
 
         data_check_string = "\n".join(
             f"{key}={value}"
-            for key, value in sorted(parsed.items())
+            for key, value in sorted(
+                parsed.items()
+            )
         )
 
         secret_key = hmac.new(
@@ -66,7 +78,11 @@ def validate_telegram_data(init_data: str):
         return json.loads(user_json)
 
     except Exception as exc:
-        print("Telegram validation error:", exc)
+        print(
+            "Telegram validation error:",
+            exc,
+        )
+
         return None
 
 
@@ -77,9 +93,9 @@ def current_user():
         "",
     )
 
-    user = validate_telegram_data(init_data)
-
-    return user
+    return validate_telegram_data(
+        init_data
+    )
 
 
 def require_player(game_id: str):
@@ -88,21 +104,27 @@ def require_player(game_id: str):
 
     if not user:
         return None, (
-            jsonify({
-                "error": "کاربر تلگرام شناسایی نشد."
-            }),
+            jsonify(
+                {
+                    "error": "کاربر تلگرام شناسایی نشد."
+                }
+            ),
             401,
         )
 
     player_id = int(user["id"])
 
-    game = game_state.get_game(game_id)
+    game = game_state.get_game(
+        game_id
+    )
 
     if not game:
         return None, (
-            jsonify({
-                "error": "بازی پیدا نشد."
-            }),
+            jsonify(
+                {
+                    "error": "بازی پیدا نشد."
+                }
+            ),
             404,
         )
 
@@ -113,41 +135,61 @@ def require_player(game_id: str):
 
     if not player:
         return None, (
-            jsonify({
-                "error": "You are not a player"
-            }),
+            jsonify(
+                {
+                    "error": "You are not a player"
+                }
+            ),
             403,
         )
 
     return user, None
 
 
+# --------------------------------------------------
+# MAIN WEB APP
+# --------------------------------------------------
+
 @app.get("/")
 def home():
 
-    return """
-    <h2>Hokm Green Dream</h2>
-    <p>Server is running.</p>
-    """
+    return send_from_directory(
+        "web",
+        "index.html",
+    )
 
+
+# --------------------------------------------------
+# HEALTH CHECK
+# --------------------------------------------------
 
 @app.get("/api/health")
 def health():
 
-    return jsonify({
-        "ok": True
-    })
+    return jsonify(
+        {
+            "ok": True
+        }
+    )
 
+
+# --------------------------------------------------
+# GET GAME
+# --------------------------------------------------
 
 @app.get("/api/game/<game_id>")
 def get_game(game_id):
 
-    user, error = require_player(game_id)
+    user, error = require_player(
+        game_id
+    )
 
     if error:
         return error
 
-    player_id = int(user["id"])
+    player_id = int(
+        user["id"]
+    )
 
     state = game_state.state_for_player(
         game_id,
@@ -155,22 +197,32 @@ def get_game(game_id):
     )
 
     if state is None:
-        return jsonify({
-            "error": "بازی پیدا نشد."
-        }), 404
+        return jsonify(
+            {
+                "error": "بازی پیدا نشد."
+            }
+        ), 404
 
     return jsonify(state)
 
 
+# --------------------------------------------------
+# START GAME
+# --------------------------------------------------
+
 @app.post("/api/game/<game_id>/start")
 def start_game(game_id):
 
-    user, error = require_player(game_id)
+    user, error = require_player(
+        game_id
+    )
 
     if error:
         return error
 
-    player_id = int(user["id"])
+    player_id = int(
+        user["id"]
+    )
 
     ok, message = game_state.start_game(
         game_id,
@@ -178,31 +230,48 @@ def start_game(game_id):
     )
 
     if not ok:
-        return jsonify({
-            "error": message
-        }), 400
+        return jsonify(
+            {
+                "error": message
+            }
+        ), 400
 
-    return jsonify({
-        "ok": True,
-        "message": message
-    })
+    return jsonify(
+        {
+            "ok": True,
+            "message": message,
+        }
+    )
 
+
+# --------------------------------------------------
+# SET HOKM
+# --------------------------------------------------
 
 @app.post("/api/game/<game_id>/hokm")
 def set_hokm(game_id):
 
-    user, error = require_player(game_id)
+    user, error = require_player(
+        game_id
+    )
 
     if error:
         return error
 
-    player_id = int(user["id"])
+    player_id = int(
+        user["id"]
+    )
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
 
-    suit = data.get("suit")
+    suit = data.get(
+        "suit"
+    )
 
     ok, message = game_state.set_hokm(
         game_id,
@@ -211,39 +280,66 @@ def set_hokm(game_id):
     )
 
     if not ok:
-        return jsonify({
-            "error": message
-        }), 400
+        return jsonify(
+            {
+                "error": message
+            }
+        ), 400
 
-    return jsonify({
-        "ok": True,
-        "message": message
-    })
+    return jsonify(
+        {
+            "ok": True,
+            "message": message,
+        }
+    )
 
+
+# --------------------------------------------------
+# PLAY CARD
+# --------------------------------------------------
 
 @app.post("/api/game/<game_id>/play")
 def play_card(game_id):
 
-    user, error = require_player(game_id)
+    user, error = require_player(
+        game_id
+    )
 
     if error:
         return error
 
-    player_id = int(user["id"])
+    player_id = int(
+        user["id"]
+    )
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
 
-    suit = data.get("suit")
-    rank = data.get("rank")
+    suit = data.get(
+        "suit"
+    )
+
+    rank = data.get(
+        "rank"
+    )
 
     try:
         rank = int(rank)
-    except (TypeError, ValueError):
-        return jsonify({
-            "error": "کارت نامعتبر است."
-        }), 400
+
+    except (
+        TypeError,
+        ValueError,
+    ):
+
+        return jsonify(
+            {
+                "error": "کارت نامعتبر است."
+            }
+        ), 400
 
     ok, message = game_state.play_card(
         game_id,
@@ -253,15 +349,23 @@ def play_card(game_id):
     )
 
     if not ok:
-        return jsonify({
-            "error": message
-        }), 400
+        return jsonify(
+            {
+                "error": message
+            }
+        ), 400
 
-    return jsonify({
-        "ok": True,
-        "message": message
-    })
+    return jsonify(
+        {
+            "ok": True,
+            "message": message,
+        }
+    )
 
+
+# --------------------------------------------------
+# RUN DIRECTLY
+# --------------------------------------------------
 
 if __name__ == "__main__":
 
