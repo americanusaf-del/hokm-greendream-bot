@@ -51,7 +51,11 @@ class GameRoom:
     game_id: str
     creator_id: int
 
-    max_players: int = 4
+    # حالت انتخاب‌شده توسط سازنده
+    mode: int = 4
+
+    # تعداد صندلی‌های میز
+    seat_count: int = 4
 
     players: list[Player] = field(
         default_factory=list
@@ -89,10 +93,6 @@ class GameState:
     def __init__(self):
         self.games: dict[str, GameRoom] = {}
 
-    # --------------------------------------------------
-    # CREATE GAME
-    # --------------------------------------------------
-
     def create_game(
         self,
         game_id: str,
@@ -107,7 +107,8 @@ class GameState:
         game = GameRoom(
             game_id=game_id,
             creator_id=creator_id,
-            max_players=max_players,
+            mode=max_players,
+            seat_count=4,
         )
 
         game.players.append(
@@ -122,20 +123,12 @@ class GameState:
 
         return game
 
-    # --------------------------------------------------
-    # GET GAME
-    # --------------------------------------------------
-
     def get_game(
         self,
         game_id: str,
     ) -> Optional[GameRoom]:
 
         return self.games.get(game_id)
-
-    # --------------------------------------------------
-    # GET PLAYER
-    # --------------------------------------------------
 
     def get_player(
         self,
@@ -144,15 +137,10 @@ class GameState:
     ) -> Optional[Player]:
 
         for player in game.players:
-
             if player.id == player_id:
                 return player
 
         return None
-
-    # --------------------------------------------------
-    # ADD PLAYER
-    # --------------------------------------------------
 
     def add_player(
         self,
@@ -175,13 +163,12 @@ class GameState:
         ):
             return True, "شما قبلاً وارد بازی شده‌اید."
 
-        # حالت ۱ نفره:
-        # فقط سازنده بازیکن واقعی است.
-        if game.max_players == 1:
+        # حالت تک‌نفره فقط برای سازنده است.
+        if game.mode == 1:
             return False, "این بازی تک‌نفره است."
 
-        if len(game.players) >= game.max_players:
-            return False, "ظرفیت بازی تکمیل است."
+        if len(game.players) >= game.mode:
+            return False, "ظرفیت بازیکنان واقعی تکمیل است."
 
         game.players.append(
             Player(
@@ -192,10 +179,6 @@ class GameState:
         )
 
         return True, "با موفقیت وارد بازی شدید."
-
-    # --------------------------------------------------
-    # ADD BOTS
-    # --------------------------------------------------
 
     def fill_with_bots(
         self,
@@ -210,7 +193,34 @@ class GameState:
         if game.started:
             return False, "بازی شروع شده است."
 
-        while len(game.players) < game.max_players:
+        # در حالت ۱ نفره:
+        # ۱ انسان + ۳ ربات
+        #
+        # در حالت ۲ نفره:
+        # تا ۲ بازیکن، بقیه صندلی‌ها ربات
+        #
+        # در حالت ۴ نفره:
+        # فقط ۴ انسان مجاز هستند.
+
+        if game.mode == 1:
+            target_humans = 1
+        elif game.mode == 2:
+            target_humans = 2
+        else:
+            target_humans = 4
+
+        if game.mode == 4:
+            if len(game.players) != 4:
+                return (
+                    False,
+                    "برای بازی ۴ نفره باید ۴ بازیکن حاضر باشند.",
+                )
+
+            return True, "میز کامل است."
+
+        # برای حالت ۱ و ۲،
+        # صندلی‌های خالی با ربات پر می‌شوند.
+        while len(game.players) < 4:
 
             bot_number = len(
                 [
@@ -235,10 +245,6 @@ class GameState:
 
         return True, "بازیکنان کامپیوتری اضافه شدند."
 
-    # --------------------------------------------------
-    # REMOVE PLAYER
-    # --------------------------------------------------
-
     def remove_player(
         self,
         game_id: str,
@@ -251,7 +257,7 @@ class GameState:
             return False, "بازی پیدا نشد."
 
         if game.started:
-            return False, "بازی شروع شده است."
+            return False, "بعد از شروع بازی امکان خروج وجود ندارد."
 
         if player_id == game.creator_id:
             return False, "سازنده نمی‌تواند خارج شود."
@@ -269,10 +275,6 @@ class GameState:
 
         return True, "از بازی خارج شدید."
 
-    # --------------------------------------------------
-    # CREATE DECK
-    # --------------------------------------------------
-
     def _new_deck(self) -> list[Card]:
 
         return [
@@ -283,10 +285,6 @@ class GameState:
             for suit in SUITS
             for rank in RANKS
         ]
-
-    # --------------------------------------------------
-    # START GAME
-    # --------------------------------------------------
 
     def start_game(
         self,
@@ -305,37 +303,22 @@ class GameState:
         if game.started:
             return False, "بازی قبلاً شروع شده است."
 
-        # اگر حالت 1 نفره باشد:
-        # سه ربات اضافه می‌کنیم.
-        if game.max_players == 1:
-
-            game.max_players = 4
-
-            ok, _ = self.fill_with_bots(
-                game_id
-            )
-
-            if not ok:
-                return False, "خطا در ساخت بازیکنان."
-
-        elif game.max_players == 2:
-
-            # دو بازیکن واقعی
-            # + دو بازیکن کامپیوتری
-            ok, _ = self.fill_with_bots(
-                game_id
-            )
-
-            if not ok:
-                return False, "خطا در ساخت بازیکنان."
-
-        else:
+        if game.mode == 4:
 
             if len(game.players) != 4:
                 return (
                     False,
                     "برای بازی ۴ نفره باید ۴ بازیکن حاضر باشند.",
                 )
+
+        else:
+
+            ok, message = self.fill_with_bots(
+                game_id
+            )
+
+            if not ok:
+                return False, message
 
         deck = self._new_deck()
 
@@ -344,7 +327,6 @@ class GameState:
         game.deck = deck
 
         for player in game.players:
-
             player.cards.clear()
             player.tricks = 0
 
@@ -355,7 +337,7 @@ class GameState:
 
         game.hakim_id = hakim.id
 
-        # ابتدا فقط ۵ کارت به هر نفر
+        # ابتدا فقط ۵ کارت به هر بازیکن
         for _ in range(5):
 
             for player in game.players:
@@ -370,12 +352,11 @@ class GameState:
         game.started = True
         game.finished = False
 
-        # هنوز حکم انتخاب نشده
         game.phase = "choose_hokm"
 
         game.hokm = None
 
-        # حاکم انتخاب حکم می‌کند
+        # حاکم باید حکم انتخاب کند
         game.current_player_id = game.hakim_id
 
         game.current_trick.clear()
@@ -390,10 +371,6 @@ class GameState:
             True,
             "بازی شروع شد. حاکم باید حکم را انتخاب کند.",
         )
-
-    # --------------------------------------------------
-    # SET HOKM
-    # --------------------------------------------------
 
     def set_hokm(
         self,
@@ -424,23 +401,16 @@ class GameState:
 
         game.hokm = suit
 
-        # حالا بقیه کارت‌ها را پخش می‌کنیم.
         self._deal_remaining_cards(game)
 
         game.phase = "playing"
 
-        # در حکم سنتی، شروع دست اول
-        # با حاکم است.
         game.current_player_id = game.hakim_id
 
         return (
             True,
             f"حکم {suit} انتخاب شد.",
         )
-
-    # --------------------------------------------------
-    # DEAL REMAINING CARDS
-    # --------------------------------------------------
 
     def _deal_remaining_cards(
         self,
@@ -464,10 +434,6 @@ class GameState:
             )
 
             player_index += 1
-
-    # --------------------------------------------------
-    # LEGAL CARDS
-    # --------------------------------------------------
 
     def legal_cards(
         self,
@@ -502,10 +468,6 @@ class GameState:
             return matching
 
         return list(player.cards)
-
-    # --------------------------------------------------
-    # PLAY CARD
-    # --------------------------------------------------
 
     def play_card(
         self,
@@ -574,10 +536,7 @@ class GameState:
         )
 
         if not game.current_trick:
-
-            game.lead_suit = (
-                selected.suit
-            )
+            game.lead_suit = selected.suit
 
         game.current_trick.append(
             {
@@ -587,7 +546,6 @@ class GameState:
             }
         )
 
-        # هنوز همه کارت بازی نشده‌اند.
         if len(game.current_trick) < len(
             game.players
         ):
@@ -606,7 +564,6 @@ class GameState:
 
             return True, "کارت بازی شد."
 
-        # تعیین برنده دست
         winner_id = self._trick_winner(
             game
         )
@@ -636,24 +593,14 @@ class GameState:
 
             return True, "بازی تمام شد."
 
-        # برنده دست بعدی را شروع می‌کند.
         game.current_player_id = winner_id
 
         return True, "دست تمام شد."
-
-    # --------------------------------------------------
-    # TRICK WINNER
-    # --------------------------------------------------
 
     def _trick_winner(
         self,
         game: GameRoom,
     ) -> int:
-
-        if not game.current_trick:
-            raise RuntimeError(
-                "دست خالی است."
-            )
 
         winner = game.current_trick[0]
 
@@ -667,10 +614,6 @@ class GameState:
                 winner = current
 
         return winner["player_id"]
-
-    # --------------------------------------------------
-    # CARD COMPARISON
-    # --------------------------------------------------
 
     def _card_beats(
         self,
@@ -688,32 +631,19 @@ class GameState:
         lead = game.lead_suit
         hokm = game.hokm
 
-        # همان خال
         if current_suit == best_suit:
             return current_rank > best_rank
 
-        # حکم می‌برد
         if current_suit == hokm:
-
-            if best_suit != hokm:
-                return True
+            return best_suit != hokm
 
         if best_suit == hokm:
+            return False
 
-            if current_suit != hokm:
-                return False
-
-        # خال شروع‌شده
         if current_suit == lead:
-
-            if best_suit != lead:
-                return True
+            return best_suit != lead
 
         return False
-
-    # --------------------------------------------------
-    # BOT PLAY
-    # --------------------------------------------------
 
     def bot_turn(
         self,
@@ -744,7 +674,8 @@ class GameState:
         if not current.is_bot:
             return None
 
-        # حاکم ربات
+        # اگر ربات حاکم باشد،
+        # خودش حکم را انتخاب می‌کند.
         if (
             game.phase == "choose_hokm"
             and current.id == game.hakim_id
@@ -762,6 +693,7 @@ class GameState:
 
             return {
                 "type": "hokm",
+                "player_id": current.id,
                 "suit": chosen,
             }
 
@@ -794,10 +726,6 @@ class GameState:
             "card": card.to_dict(),
         }
 
-    # --------------------------------------------------
-    # BOT HOKM
-    # --------------------------------------------------
-
     def _bot_choose_hokm(
         self,
         player: Player,
@@ -816,30 +744,20 @@ class GameState:
             key=counts.get,
         )
 
-    # --------------------------------------------------
-    # BOT CARD
-    # --------------------------------------------------
-
     def _bot_choose_card(
         self,
         game: GameRoom,
         legal: list[Card],
     ) -> Card:
 
-        # فعلاً ساده ولی قانونی:
-        # پایین‌ترین کارت مجاز را بازی می‌کند.
-
+        # ربات فعلاً ضعیف ولی قانونی بازی می‌کند.
         return sorted(
             legal,
             key=lambda card: (
                 card.rank,
                 SUITS.index(card.suit),
-            ),
+            )
         )[0]
-
-    # --------------------------------------------------
-    # PUBLIC GAME STATE
-    # --------------------------------------------------
 
     def state_for_player(
         self,
@@ -862,15 +780,22 @@ class GameState:
         if not viewer:
             return None
 
+        hakim = self.get_player(
+            game,
+            game.hakim_id,
+        )
+
+        current = self.get_player(
+            game,
+            game.current_player_id,
+        )
+
         players = []
 
         for player in game.players:
 
             visible_cards = []
 
-            # فقط کارت‌های خود کاربر
-            # و در مرحله حکم، کارت‌های حاکم
-            # برای خودش نمایش داده می‌شود.
             if player.id == player_id:
 
                 visible_cards = [
@@ -899,6 +824,36 @@ class GameState:
                 }
             )
 
+        if game.phase == "waiting":
+            status_text = "منتظر شروع بازی"
+
+        elif game.phase == "choose_hokm":
+
+            if game.hakim_id == player_id:
+                status_text = "👑 شما حاکم هستید؛ حکم را انتخاب کنید"
+            else:
+                status_text = (
+                    f"👑 حاکم: {hakim.name if hakim else 'نامشخص'}"
+                    " — منتظر انتخاب حکم"
+                )
+
+        elif game.phase == "playing":
+
+            if game.current_player_id == player_id:
+                status_text = "🎯 نوبت شماست"
+
+            else:
+                status_text = (
+                    f"🎯 نوبت: "
+                    f"{current.name if current else 'نامشخص'}"
+                )
+
+        elif game.phase == "finished":
+            status_text = "🏆 بازی تمام شد"
+
+        else:
+            status_text = "در حال بازی"
+
         return {
             "game_id": game.game_id,
 
@@ -906,10 +861,18 @@ class GameState:
 
             "creator_id": game.creator_id,
 
-            "max_players": game.max_players,
+            "mode": game.mode,
+
+            "max_players": game.mode,
+
+            "seat_count": 4,
 
             "player_count": len(
-                game.players
+                [
+                    p
+                    for p in game.players
+                    if not p.is_bot
+                ]
             ),
 
             "started": game.started,
@@ -918,12 +881,26 @@ class GameState:
 
             "phase": game.phase,
 
+            "status_text": status_text,
+
             "hakim_id": game.hakim_id,
+
+            "hakim_name": (
+                hakim.name
+                if hakim
+                else None
+            ),
 
             "hokm": game.hokm,
 
             "current_player_id": (
                 game.current_player_id
+            ),
+
+            "current_player_name": (
+                current.name
+                if current
+                else None
             ),
 
             "lead_suit": game.lead_suit,
