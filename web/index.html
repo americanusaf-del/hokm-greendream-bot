@@ -2,16 +2,8 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0,
-                 maximum-scale=1.0, user-scalable=no"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>حکم گرین‌دریم</title>
-
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
     <style>
         * {
@@ -21,16 +13,17 @@
 
         body {
             margin: 0;
-            background:
-                radial-gradient(
-                    circle at center,
-                    #08764c 0%,
-                    #043d2a 75%
-                );
-            color: white;
-            font-family: Arial, Tahoma, sans-serif;
             min-height: 100vh;
-            overflow: hidden;
+            background:
+                radial-gradient(circle at top, #19713f 0%, #0d4428 45%, #062619 100%);
+            color: white;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                Tahoma,
+                sans-serif;
+            overflow-x: hidden;
         }
 
         button {
@@ -39,316 +32,301 @@
 
         .app {
             width: 100%;
-            max-width: 650px;
-            height: 100vh;
+            max-width: 900px;
+            min-height: 100vh;
             margin: auto;
-            display: flex;
-            flex-direction: column;
-            padding: 8px 10px;
+            padding: 10px;
         }
 
-        .top {
+        .topbar {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            padding: 5px 8px 10px;
-        }
-
-        .title {
-            font-size: 21px;
-            font-weight: bold;
-        }
-
-        .round {
-            background: rgba(0,0,0,.35);
-            padding: 7px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-        }
-
-        .score-box {
-            display: flex;
             justify-content: space-between;
-            background: rgba(0,0,0,.35);
-            border-radius: 14px;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 900;
+        }
+
+        .game-id {
+            background: rgba(0,0,0,.25);
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            color: #e8f7ed;
+        }
+
+        .status {
+            text-align: center;
             padding: 8px 12px;
             margin-bottom: 8px;
-            font-size: 12px;
+            border-radius: 12px;
+            background: rgba(0,0,0,.22);
+            font-size: 14px;
+            min-height: 38px;
+        }
+
+        .status.error {
+            background: rgba(160,20,20,.55);
+        }
+
+        .status.success {
+            background: rgba(20,130,70,.55);
+        }
+
+        .room-panel {
+            background: rgba(0,0,0,.25);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 18px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .room-title {
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
+
+        .players {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
+        }
+
+        .player {
+            background: rgba(255,255,255,.08);
+            border-radius: 12px;
+            padding: 8px 5px;
+            text-align: center;
+            min-height: 68px;
+            border: 1px solid transparent;
+        }
+
+        .player.me {
+            border-color: #e5bd5a;
+        }
+
+        .player.turn {
+            box-shadow:
+                0 0 0 2px #e5bd5a,
+                0 0 15px rgba(229,189,90,.35);
+        }
+
+        .player-avatar {
+            font-size: 24px;
+        }
+
+        .player-name {
+            font-size: 11px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .player-info {
+            font-size: 9px;
+            opacity: .7;
+            margin-top: 2px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn {
+            border: 0;
+            border-radius: 12px;
+            padding: 11px 15px;
+            font-weight: 900;
+            cursor: pointer;
+            background: #d9ad43;
+            color: #1d1606;
+            flex: 1;
+            min-width: 130px;
+        }
+
+        .btn:disabled {
+            opacity: .45;
+            cursor: default;
+        }
+
+        .btn.secondary {
+            background: rgba(255,255,255,.12);
+            color: white;
         }
 
         .table {
             position: relative;
-            flex: 1;
-            min-height: 430px;
-            border: 5px solid #d4a93c;
-            border-radius: 35px;
-
+            width: 100%;
+            aspect-ratio: 1.45 / 1;
+            min-height: 390px;
+            border-radius: 42%;
             background:
                 radial-gradient(
-                    circle at center,
-                    #16865b 0%,
-                    #07623f 55%,
-                    #03452e 100%
+                    ellipse at center,
+                    #17804a 0%,
+                    #0e5d35 55%,
+                    #093c24 100%
                 );
-
+            border: 13px solid #c69a42;
             box-shadow:
-                inset 0 0 35px rgba(0,0,0,.35),
-                0 5px 20px rgba(0,0,0,.35);
+                inset 0 0 0 5px #76551e,
+                inset 0 0 40px rgba(0,0,0,.45),
+                0 15px 35px rgba(0,0,0,.35);
+            overflow: hidden;
         }
 
-        .player {
+        .table::after {
+            content: "";
             position: absolute;
+            inset: 15px;
+            border: 1px solid rgba(255,255,255,.08);
+            border-radius: 42%;
+            pointer-events: none;
+        }
+
+        .center-info {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             text-align: center;
-            min-width: 75px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .hokm-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 65px;
+            height: 40px;
+            padding: 0 12px;
+            border-radius: 999px;
+            background: rgba(0,0,0,.35);
+            border: 1px solid rgba(255,255,255,.15);
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .turn-text {
+            margin-top: 7px;
+            font-size: 11px;
+            opacity: .8;
+        }
+
+        .played-card {
+            position: absolute;
+            width: 66px;
+            height: 92px;
+            border-radius: 9px;
+            background: #fff;
+            color: #171717;
+            box-shadow: 0 5px 12px rgba(0,0,0,.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-weight: 900;
             z-index: 5;
         }
 
-        .player-avatar {
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            font-size: 27px;
-            margin: auto;
-
-            background: #252525;
-            border: 3px solid #777;
-
-            box-shadow:
-                0 3px 10px rgba(0,0,0,.4);
+        .played-card.red {
+            color: #c92828;
         }
 
-        .player-avatar.me {
-            border-color: #67e0b0;
-            box-shadow:
-                0 0 12px rgba(103,224,176,.6);
+        .played-rank {
+            font-size: 22px;
+            line-height: 1;
         }
 
-        .player-avatar.hakim {
-            border-color: #e7bd4a;
-            box-shadow:
-                0 0 12px #e7bd4a;
-        }
-
-        .player-name {
-            background: rgba(0,0,0,.55);
-            border-radius: 15px;
-            padding: 4px 9px;
-            margin-top: 4px;
-            font-size: 12px;
-        }
-
-        .player-count {
-            font-size: 11px;
-            opacity: .8;
-            margin-top: 3px;
-        }
-
-        .hakim-label {
-            background: #d5a72e;
-            color: #171717;
-            font-weight: bold;
-            border-radius: 12px;
-            padding: 3px 10px;
-            font-size: 11px;
-            margin-bottom: 4px;
-        }
-
-        .top-player {
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .left-player {
-            left: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .right-player {
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .bottom-player {
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .hokm {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-
-            background: rgba(0,0,0,.45);
-            padding: 8px 13px;
-            border-radius: 18px;
-            font-size: 14px;
-
-            z-index: 10;
-        }
-
-        .center {
-            position: absolute;
-            width: 190px;
-            height: 190px;
-
-            left: 50%;
-            top: 50%;
-
-            transform: translate(-50%, -50%);
-        }
-
-        .played {
-            position: absolute;
-
-            width: 72px;
-            height: 100px;
-
-            background: white;
-            color: #111;
-
-            border-radius: 9px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
+        .played-suit {
             font-size: 23px;
-            font-weight: bold;
-
-            box-shadow:
-                0 5px 15px rgba(0,0,0,.35);
-
-            z-index: 3;
+            line-height: 1;
         }
 
-        .played.red {
-            color: #d52323;
-        }
-
-        .card-top {
-            top: 0;
-            left: 50%;
-            transform:
-                translateX(-50%)
-                rotate(-3deg);
-        }
-
-        .card-left {
-            left: 0;
-            top: 50%;
-            transform:
-                translateY(-50%)
-                rotate(-7deg);
-        }
-
-        .card-right {
-            right: 0;
-            top: 50%;
-            transform:
-                translateY(-50%)
-                rotate(7deg);
-        }
-
-        .card-bottom {
-            bottom: 0;
-            left: 50%;
-            transform:
-                translateX(-50%)
-                rotate(2deg);
-        }
-
-        .empty-message {
+        .played-label {
             position: absolute;
-
-            left: 50%;
-            top: 50%;
-
-            transform:
-                translate(-50%, -50%);
-
-            font-size: 13px;
-            opacity: .55;
-
+            font-size: 9px;
+            background: rgba(0,0,0,.5);
+            color: white;
+            padding: 3px 6px;
+            border-radius: 999px;
             white-space: nowrap;
+            bottom: -19px;
         }
 
-        .turn {
-            background: rgba(0,0,0,.55);
-            border-radius: 18px;
-
-            padding: 8px 15px;
-
-            text-align: center;
-            font-size: 13px;
-
-            margin: 8px auto;
-
-            width: fit-content;
-            min-width: 160px;
+        .played-card.pos-0 {
+            top: 12%;
+            left: 50%;
+            transform: translateX(-50%);
         }
 
-        .turn.my-turn {
-            background: rgba(19,133,83,.9);
-            box-shadow:
-                0 0 12px rgba(103,224,176,.35);
+        .played-card.pos-1 {
+            right: 12%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .played-card.pos-2 {
+            bottom: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .played-card.pos-3 {
+            left: 12%;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .hand-section {
+            margin-top: 10px;
         }
 
         .hand-title {
             text-align: center;
-            font-size: 13px;
-            margin: 7px 0 2px;
+            font-size: 12px;
+            opacity: .8;
+            margin-bottom: 4px;
         }
 
         .hand {
-            height: 125px;
-
             position: relative;
-
-            direction: ltr;
-
+            height: 135px;
             display: flex;
             justify-content: center;
             align-items: flex-end;
-
-            padding-bottom: 3px;
+            direction: ltr;
+            overflow: visible;
         }
 
         .card {
-            width: 52px;
-            height: 82px;
-
-            background: white;
-            color: #111;
-
-            border: 2px solid #ddd;
-            border-radius: 7px;
-
-            font-size: 15px;
-            font-weight: bold;
-
+            position: relative;
+            width: 58px;
+            height: 86px;
+            margin-left: -15px;
+            border-radius: 9px;
+            background: #fff;
+            color: #171717;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0,0,0,.35);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-
-            margin-left: -17px;
-
             cursor: pointer;
-
-            box-shadow:
-                0 3px 7px rgba(0,0,0,.35);
-
             transition:
-                transform .15s,
-                opacity .15s;
+                transform .15s ease,
+                margin .15s ease,
+                opacity .15s ease;
+            flex-shrink: 0;
         }
 
         .card:first-child {
@@ -356,108 +334,137 @@
         }
 
         .card.red {
-            color: #d21d1d;
+            color: #c92828;
         }
 
-        .card:active {
-            transform: translateY(-18px);
+        .card-rank {
+            font-size: 18px;
+            font-weight: 900;
+            line-height: 1;
         }
 
-        .card.disabled {
+        .card-suit {
+            font-size: 21px;
+            line-height: 1;
+            margin-top: 3px;
+        }
+
+        .card.legal:hover,
+        .card.legal:active {
+            transform: translateY(-20px);
+            z-index: 20;
+        }
+
+        .card.not-legal {
             opacity: .45;
-            cursor: default;
         }
 
-        .status {
+        .card.my-turn {
+            box-shadow:
+                0 0 0 2px #e4bd5a,
+                0 4px 12px rgba(0,0,0,.4);
+        }
+
+        .scores {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .score {
+            background: rgba(0,0,0,.24);
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+
+        .hokm-panel {
+            background: rgba(0,0,0,.3);
+            border: 1px solid rgba(255,255,255,.12);
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 10px;
             text-align: center;
+        }
 
-            min-height: 25px;
+        .hokm-title {
+            font-weight: 900;
+            margin-bottom: 8px;
+        }
 
-            font-size: 13px;
+        .suits {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
 
-            color: #c9ffe5;
+        .suit-btn {
+            border: 0;
+            border-radius: 13px;
+            padding: 12px 5px;
+            background: #fff;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .suit-btn.red {
+            color: #c92828;
         }
 
         .loading {
             position: fixed;
-
             inset: 0;
-
-            display: flex;
+            background: rgba(0,0,0,.55);
+            display: none;
             align-items: center;
             justify-content: center;
-
-            background:
-                rgba(0,30,20,.92);
-
             z-index: 100;
         }
 
+        .loading.show {
+            display: flex;
+        }
+
         .loading-box {
+            background: #103b25;
+            border: 1px solid rgba(255,255,255,.15);
+            border-radius: 16px;
+            padding: 20px 30px;
             text-align: center;
-            padding: 25px;
         }
 
-        .loading-icon {
-            font-size: 45px;
-            margin-bottom: 12px;
-        }
-
-        .error-box {
-            position: fixed;
-
-            left: 15px;
-            right: 15px;
-            top: 50%;
-
-            transform: translateY(-50%);
-
-            background: #18221e;
-
-            border: 1px solid #d4a93c;
-
-            border-radius: 18px;
-
-            padding: 22px;
-
-            text-align: center;
-
-            z-index: 200;
-
-            display: none;
-        }
-
-        @media (max-width: 400px) {
+        @media (max-width: 600px) {
+            .app {
+                padding: 7px;
+            }
 
             .table {
-                min-height: 390px;
+                min-height: 350px;
+                border-width: 10px;
             }
 
-            .played {
-                width: 62px;
-                height: 88px;
-                font-size: 20px;
+            .players {
+                grid-template-columns: repeat(4, 1fr);
             }
 
-            .center {
-                width: 165px;
-                height: 165px;
-            }
-
-            .card {
-                width: 45px;
-                height: 74px;
-                margin-left: -18px;
+            .player {
+                min-height: 62px;
             }
 
             .hand {
-                height: 115px;
+                height: 125px;
             }
 
-            .player-avatar {
-                width: 48px;
-                height: 48px;
-                font-size: 23px;
+            .card {
+                width: 53px;
+                height: 80px;
+                margin-left: -18px;
+            }
+
+            .played-card {
+                width: 58px;
+                height: 82px;
             }
         }
     </style>
@@ -465,914 +472,1111 @@
 
 <body>
 
-<div class="loading" id="loading">
-    <div class="loading-box">
-        <div class="loading-icon">🃏</div>
-        <div>در حال اتصال به بازی...</div>
-    </div>
-</div>
-
-<div class="error-box" id="errorBox">
-    <div style="font-size:35px;">⚠️</div>
-    <h3>خطا</h3>
-    <div id="errorText"></div>
-</div>
-
 <div class="app">
 
-    <div class="top">
-        <div class="title">🃏 حکم گرین‌دریم</div>
-        <div class="round" id="round">
-            دست ۱
-        </div>
+    <div class="topbar">
+        <div class="logo">🎴 حکم گرین‌دریم</div>
+        <div class="game-id" id="gameIdLabel">---</div>
     </div>
 
-    <div class="score-box">
-        <span>
-            🟢 تیم شما:
-            <b id="myScore">0</b>
-        </span>
+    <div id="status" class="status">
+        در حال اتصال به بازی...
+    </div>
 
-        <span>
-            🔴 حریف:
-            <b id="enemyScore">0</b>
-        </span>
+    <div class="room-panel">
 
-        <span>
-            🎴 باقی:
-            <b id="remaining">0</b>
-        </span>
+        <div class="room-title">
+            👥 بازیکنان
+        </div>
+
+        <div id="players" class="players"></div>
+
+        <div class="actions">
+
+            <button
+                id="startButton"
+                class="btn"
+                onclick="startGame()"
+                style="display:none"
+            >
+                🎮 شروع بازی
+            </button>
+
+            <button
+                id="refreshButton"
+                class="btn secondary"
+                onclick="loadGame()"
+            >
+                🔄 بروزرسانی
+            </button>
+
+        </div>
+
     </div>
 
     <div class="table">
 
-        <div class="hokm">
-            حکم:
-            <b id="hokm">—</b>
-        </div>
-
-        <div
-            class="player top-player"
-            id="playerTop"
-        ></div>
-
-        <div
-            class="player left-player"
-            id="playerLeft"
-        ></div>
-
-        <div
-            class="player right-player"
-            id="playerRight"
-        ></div>
-
-        <div class="center">
+        <div id="centerInfo" class="center-info">
 
             <div
-                class="empty-message"
-                id="emptyMessage"
+                id="hokmBadge"
+                class="hokm-badge"
             >
-                منتظر بازی...
+                حکم؟
             </div>
 
             <div
-                class="played card-top"
-                id="topCard"
-                style="display:none;"
-            ></div>
-
-            <div
-                class="played card-left"
-                id="leftCard"
-                style="display:none;"
-            ></div>
-
-            <div
-                class="played card-right"
-                id="rightCard"
-                style="display:none;"
-            ></div>
-
-            <div
-                class="played card-bottom"
-                id="bottomCard"
-                style="display:none;"
-            ></div>
+                id="turnText"
+                class="turn-text"
+            >
+                منتظر بازی
+            </div>
 
         </div>
 
+        <div id="trickCards"></div>
+
+    </div>
+
+    <div
+        id="hokmPanel"
+        class="hokm-panel"
+        style="display:none"
+    >
+
+        <div class="hokm-title">
+            👑 حاکم، حکم را انتخاب کن
+        </div>
+
+        <div class="suits">
+
+            <button
+                class="suit-btn red"
+                onclick="chooseHokm('♥')"
+            >
+                ♥
+            </button>
+
+            <button
+                class="suit-btn red"
+                onclick="chooseHokm('♦')"
+            >
+                ♦
+            </button>
+
+            <button
+                class="suit-btn"
+                onclick="chooseHokm('♣')"
+            >
+                ♣
+            </button>
+
+            <button
+                class="suit-btn"
+                onclick="chooseHokm('♠')"
+            >
+                ♠
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="hand-section">
+
+        <div class="hand-title">
+            🃏 کارت‌های شما
+        </div>
+
         <div
-            class="player bottom-player"
-            id="playerBottom"
+            id="hand"
+            class="hand"
         ></div>
 
     </div>
 
     <div
-        class="turn"
-        id="turn"
-    >
-        در حال اتصال...
-    </div>
-
-    <div class="hand-title">
-        کارت‌های شما
-    </div>
-
-    <div
-        class="hand"
-        id="hand"
+        id="scores"
+        class="scores"
     ></div>
 
-    <div
-        class="status"
-        id="status"
-    >
-        در حال دریافت اطلاعات بازی...
-    </div>
+</div>
 
+<div
+    id="loading"
+    class="loading"
+>
+    <div class="loading-box">
+        <div>⏳</div>
+        <div>لطفاً صبر کنید...</div>
+    </div>
 </div>
 
 <script>
 
-const tg =
-    window.Telegram &&
-    window.Telegram.WebApp
-        ? window.Telegram.WebApp
-        : null;
+    const tg =
+        window.Telegram &&
+        window.Telegram.WebApp
+            ? window.Telegram.WebApp
+            : null;
 
-if (tg) {
-    tg.ready();
-    tg.expand();
-}
-
-
-/*
-    شناسه بازی از لینک Mini App گرفته می‌شود.
-
-    مثال:
-    ?game=AB12CD34
-*/
-
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
-
-const gameId =
-    params.get("game") ||
-    (
-        tg &&
-        tg.initDataUnsafe &&
-        tg.initDataUnsafe.start_param
-            ? tg.initDataUnsafe.start_param
-            : ""
-    );
-
-
-const loading =
-    document.getElementById("loading");
-
-const errorBox =
-    document.getElementById("errorBox");
-
-const errorText =
-    document.getElementById("errorText");
-
-const hand =
-    document.getElementById("hand");
-
-const status =
-    document.getElementById("status");
-
-const turn =
-    document.getElementById("turn");
-
-const remaining =
-    document.getElementById("remaining");
-
-const myScore =
-    document.getElementById("myScore");
-
-const enemyScore =
-    document.getElementById("enemyScore");
-
-const myUserId =
-    tg &&
-    tg.initDataUnsafe &&
-    tg.initDataUnsafe.user
-        ? tg.initDataUnsafe.user.id
-        : null;
-
-
-/*
-    Telegram initData واقعی.
-    این مقدار توسط سرور اعتبارسنجی می‌شود.
-*/
-
-const initData =
-    tg
-        ? tg.initData
-        : "";
-
-
-/*
-    نمایش خطا
-*/
-
-function showError(message) {
-
-    loading.style.display = "none";
-
-    errorText.textContent =
-        message;
-
-    errorBox.style.display =
-        "block";
-}
-
-
-/*
-    درخواست به API
-*/
-
-async function api(
-    url,
-    options = {}
-) {
-
-    const headers = {
-        "Content-Type":
-            "application/json",
-
-        "X-Telegram-Init-Data":
-            initData,
-
-        ...(options.headers || {})
-    };
-
-    const response =
-        await fetch(
-            url,
-            {
-                ...options,
-                headers
-            }
-        );
-
-    const data =
-        await response.json();
-
-    if (!response.ok) {
-
-        throw new Error(
-            data.error ||
-            "خطای سرور"
-        );
+    if (tg) {
+        tg.ready();
+        tg.expand();
     }
 
-    return data;
-}
+    let gameId = null;
+    let game = null;
+    let loading = false;
 
+    function getTelegramInitData() {
 
-/*
-    ساخت نمایش بازیکن
-*/
-
-function renderPlayer(
-    element,
-    player
-) {
-
-    if (!player) {
-
-        element.innerHTML = "";
-
-        return;
-    }
-
-    const avatar =
-        player.is_me
-            ? "🦉"
-            : "🐯";
-
-    const hakim =
-        player.is_hakim;
-
-    element.innerHTML = `
-        ${
-            hakim
-                ? `<div class="hakim-label">
-                       👑 حاکم
-                   </div>`
-                : ""
+        if (!tg) {
+            return "";
         }
 
-        <div class="player-avatar
-                    ${player.is_me ? "me" : ""}
-                    ${hakim ? "hakim" : ""}">
-            ${avatar}
-        </div>
+        return tg.initData || "";
+    }
 
-        <div class="player-name">
-            ${
-                player.is_me
-                    ? "شما"
-                    : escapeHtml(player.name)
+    function findGameId() {
+
+        const params =
+            new URLSearchParams(
+                window.location.search
+            );
+
+        let id =
+            params.get("game");
+
+        if (id) {
+            return id;
+        }
+
+        if (tg) {
+
+            const startParam =
+                tg.initDataUnsafe &&
+                tg.initDataUnsafe.start_param;
+
+            if (startParam) {
+                return startParam;
             }
-        </div>
+        }
 
-        <div class="player-count">
-            🂠 ${player.cards_count} کارت
-        </div>
-    `;
-}
-
-
-/*
-    جلوگیری از ورود HTML نام بازیکن
-*/
-
-function escapeHtml(text) {
-
-    const div =
-        document.createElement(
-            "div"
-        );
-
-    div.textContent =
-        text || "";
-
-    return div.innerHTML;
-}
-
-
-/*
-    نمایش بازیکنان دور میز
-*/
-
-function renderPlayers(game) {
-
-    const me =
-        game.players.find(
-            p => p.is_me
-        );
-
-    if (!me) return;
-
-    const others =
-        game.players.filter(
-            p => !p.is_me
-        );
-
-    /*
-        جای بازیکنان نسبت به خودمان.
-
-        در بازی ۴ نفره:
-        نفر روبه‌رو = top
-        نفر سمت چپ = left
-        نفر سمت راست = right
-    */
-
-    const positions = {};
-
-    positions[me.position] =
-        "bottom";
-
-    if (others.length >= 1) {
-
-        positions[
-            others[0].position
-        ] = "top";
+        return null;
     }
 
-    if (others.length >= 2) {
-
-        positions[
-            others[1].position
-        ] = "left";
-    }
-
-    if (others.length >= 3) {
-
-        positions[
-            others[2].position
-        ] = "right";
-    }
-
-    document.getElementById(
-        "playerTop"
-    ).innerHTML = "";
-
-    document.getElementById(
-        "playerLeft"
-    ).innerHTML = "";
-
-    document.getElementById(
-        "playerRight"
-    ).innerHTML = "";
-
-    document.getElementById(
-        "playerBottom"
-    ).innerHTML = "";
-
-    for (
-        const player of game.players
+    async function api(
+        url,
+        options = {}
     ) {
 
-        const position =
-            positions[player.position];
+        const headers = {
+            "Content-Type":
+                "application/json",
 
-        if (position === "top") {
+            "X-Telegram-Init-Data":
+                getTelegramInitData(),
 
-            renderPlayer(
-                document.getElementById(
-                    "playerTop"
-                ),
-                player
-            );
-        }
+            ...(options.headers || {})
+        };
 
-        if (position === "left") {
-
-            renderPlayer(
-                document.getElementById(
-                    "playerLeft"
-                ),
-                player
-            );
-        }
-
-        if (position === "right") {
-
-            renderPlayer(
-                document.getElementById(
-                    "playerRight"
-                ),
-                player
-            );
-        }
-
-        if (position === "bottom") {
-
-            renderPlayer(
-                document.getElementById(
-                    "playerBottom"
-                ),
-                player
-            );
-        }
-    }
-}
-
-
-/*
-    نمایش کارت‌های دست خودمان
-*/
-
-function renderHand(game) {
-
-    hand.innerHTML = "";
-
-    const cards =
-        game.my_hand || [];
-
-    remaining.textContent =
-        cards.length;
-
-    if (!cards.length) {
-
-        status.textContent =
-            "کارت دیگری در دست شما نیست.";
-
-        return;
-    }
-
-    const myTurn =
-        game.current_player_id ===
-        game.my_user_id;
-
-    for (
-        const card of cards
-    ) {
-
-        const button =
-            document.createElement(
-                "button"
-            );
-
-        button.className =
-            "card";
-
-        if (
-            card.suit === "♥" ||
-            card.suit === "♦"
-        ) {
-            button.classList.add(
-                "red"
-            );
-        }
-
-        button.textContent =
-            card.text;
-
-        /*
-            اگر نوبت ما نباشد
-            کارت‌ها غیرفعال هستند.
-        */
-
-        if (!myTurn) {
-
-            button.classList.add(
-                "disabled"
-            );
-        }
-
-        button.addEventListener(
-            "click",
-            () => {
-
-                if (!myTurn) {
-
-                    status.textContent =
-                        "⏳ هنوز نوبت شما نیست.";
-
-                    return;
+        const response =
+            await fetch(
+                url,
+                {
+                    ...options,
+                    headers
                 }
+            );
 
-                playCard(
-                    card.text
-                );
-            }
-        );
+        let data = null;
 
-        hand.appendChild(
-            button
-        );
+        try {
+
+            data =
+                await response.json();
+
+        } catch (error) {
+
+            data = {
+                ok: false,
+                error:
+                    "پاسخ نامعتبر از سرور"
+            };
+        }
+
+        if (!response.ok) {
+
+            throw new Error(
+                data.error ||
+                "خطا در ارتباط با سرور"
+            );
+        }
+
+        return data;
     }
-}
 
-
-/*
-    بازی کردن کارت
-*/
-
-async function playCard(
-    cardText
-) {
-
-    status.textContent =
-        "⏳ در حال ارسال کارت...";
-
-    try {
-
-        await api(
-            `/api/game/${encodeURIComponent(gameId)}/play`,
-            {
-                method: "POST",
-
-                body: JSON.stringify(
-                    {
-                        card: cardText
-                    }
-                )
-            }
-        );
-
-        status.textContent =
-            `🃏 ${cardText} بازی شد.`;
-
-        await loadGame();
-
-    } catch (error) {
-
-        status.textContent =
-            error.message ||
-            "بازی کردن کارت ناموفق بود.";
-    }
-}
-
-
-/*
-    نمایش کارت‌های وسط میز
-*/
-
-function renderTrick(game) {
-
-    const slots = {
-        top:
-            document.getElementById(
-                "topCard"
-            ),
-
-        left:
-            document.getElementById(
-                "leftCard"
-            ),
-
-        right:
-            document.getElementById(
-                "rightCard"
-            ),
-
-        bottom:
-            document.getElementById(
-                "bottomCard"
-            )
-    };
-
-    for (
-        const key of Object.keys(slots)
+    function setStatus(
+        text,
+        type = ""
     ) {
-
-        slots[key].style.display =
-            "none";
-
-        slots[key].textContent =
-            "";
-    }
-
-    const me =
-        game.players.find(
-            p => p.is_me
-        );
-
-    if (!me) return;
-
-    const others =
-        game.players.filter(
-            p => !p.is_me
-        );
-
-    const positionMap = {};
-
-    positionMap[
-        me.position
-    ] = "bottom";
-
-    if (others.length >= 1) {
-
-        positionMap[
-            others[0].position
-        ] = "top";
-    }
-
-    if (others.length >= 2) {
-
-        positionMap[
-            others[1].position
-        ] = "left";
-    }
-
-    if (others.length >= 3) {
-
-        positionMap[
-            others[2].position
-        ] = "right";
-    }
-
-    for (
-        const played of game.current_trick
-    ) {
-
-        const position =
-            positionMap[
-                played.player_position
-            ];
 
         const element =
-            slots[position];
+            document.getElementById(
+                "status"
+            );
 
-        if (!element) continue;
+        element.textContent = text;
 
-        element.textContent =
-            played.card.text;
+        element.className =
+            "status " + type;
+    }
 
-        if (
-            played.card.suit === "♥" ||
-            played.card.suit === "♦"
-        ) {
+    function showLoading(
+        value
+    ) {
+
+        loading = value;
+
+        const element =
+            document.getElementById(
+                "loading"
+            );
+
+        if (value) {
 
             element.classList.add(
-                "red"
+                "show"
+            );
+
+        } else {
+
+            element.classList.remove(
+                "show"
             );
         }
-
-        element.style.display =
-            "flex";
     }
 
-    const empty =
-        document.getElementById(
-            "emptyMessage"
-        );
+    async function loadGame(
+        silent = false
+    ) {
 
-    empty.style.display =
-        game.current_trick.length
-            ? "none"
-            : "block";
-}
+        if (!gameId) {
 
-
-/*
-    نمایش حکم
-*/
-
-function renderHokm(game) {
-
-    document.getElementById(
-        "hokm"
-    ).textContent =
-        game.hokm || "—";
-}
-
-
-/*
-    نمایش نوبت
-*/
-
-function renderTurn(game) {
-
-    const isMyTurn =
-        game.current_player_id ===
-        game.my_user_id;
-
-    turn.classList.toggle(
-        "my-turn",
-        isMyTurn
-    );
-
-    if (game.finished) {
-
-        turn.textContent =
-            "🏁 بازی تمام شد.";
-
-        return;
-    }
-
-    if (isMyTurn) {
-
-        turn.textContent =
-            "🟢 نوبت شماست";
-
-        status.textContent =
-            "یک کارت قانونی را انتخاب کنید.";
-
-    } else {
-
-        const current =
-            game.players.find(
-                p =>
-                    p.id ===
-                    game.current_player_id
+            setStatus(
+                "شناسه بازی پیدا نشد.",
+                "error"
             );
 
-        turn.textContent =
-            current
-                ? `⏳ نوبت ${current.name}`
-                : "⏳ منتظر حرکت بازیکن...";
-    }
-}
-
-
-/*
-    امتیازها
-*/
-
-function renderScores(game) {
-
-    const me =
-        game.players.find(
-            p => p.is_me
-        );
-
-    if (!me) return;
-
-    const myTeam =
-        me.position % 2;
-
-    const enemyTeam =
-        myTeam === 0
-            ? 1
-            : 0;
-
-    myScore.textContent =
-        game.team_scores &&
-        game.team_scores[myTeam]
-            ? game.team_scores[myTeam]
-            : 0;
-
-    enemyScore.textContent =
-        game.team_scores &&
-        game.team_scores[enemyTeam]
-            ? game.team_scores[enemyTeam]
-            : 0;
-}
-
-
-/*
-    دریافت وضعیت کامل بازی
-*/
-
-async function loadGame() {
-
-    if (!gameId) {
-
-        showError(
-            "شناسه بازی پیدا نشد."
-        );
-
-        return;
-    }
-
-    try {
-
-        const data =
-            await api(
-                `/api/game/${encodeURIComponent(gameId)}`
-            );
-
-        const game =
-            data.game;
-
-        renderPlayers(game);
-
-        renderHand(game);
-
-        renderTrick(game);
-
-        renderHokm(game);
-
-        renderTurn(game);
-
-        renderScores(game);
-
-        loading.style.display =
-            "none";
-
-    } catch (error) {
-
-        showError(
-            error.message ||
-            "اتصال به بازی برقرار نشد."
-        );
-    }
-}
-
-
-/*
-    بروزرسانی خودکار بازی.
-
-    فعلاً هر ۱ ثانیه وضعیت را
-    از سرور می‌گیریم.
-*/
-
-let lastRefresh =
-    Date.now();
-
-setInterval(
-    async () => {
-
-        /*
-            جلوگیری از درخواست‌های
-            خیلی نزدیک به هم
-        */
-
-        if (
-            Date.now() -
-            lastRefresh <
-            800
-        ) {
             return;
         }
 
-        lastRefresh =
-            Date.now();
-
-        if (
-            document.hidden
-        ) {
-            return;
+        if (!silent) {
+            showLoading(true);
         }
 
         try {
 
-            await loadGame();
+            const data =
+                await api(
+                    `/api/game/${gameId}`
+                );
 
-        } catch (_) {
-            // خطا در بروزرسانی بعدی دوباره امتحان می‌شود.
+            game = data.game;
+
+            renderGame();
+
+        } catch (error) {
+
+            setStatus(
+                translateError(
+                    error.message
+                ),
+                "error"
+            );
+
+        } finally {
+
+            if (!silent) {
+                showLoading(false);
+            }
+        }
+    }
+
+    function renderGame() {
+
+        if (!game) {
+            return;
         }
 
-    },
-    1000
-);
+        document.getElementById(
+            "gameIdLabel"
+        ).textContent =
+            game.id;
 
+        renderPlayers();
+        renderTable();
+        renderHand();
+        renderScores();
+        renderStartButton();
+        renderHokm();
+        renderStatus();
+    }
 
-/*
-    شروع Mini App
-*/
+    function renderPlayers() {
 
-loadGame();
+        const container =
+            document.getElementById(
+                "players"
+            );
+
+        container.innerHTML = "";
+
+        const avatars = [
+            "👤",
+            "🧑",
+            "👨",
+            "👩"
+        ];
+
+        for (
+            let i = 0;
+            i < game.players.length;
+            i++
+        ) {
+
+            const player =
+                game.players[i];
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "player";
+
+            if (player.is_me) {
+                div.classList.add(
+                    "me"
+                );
+            }
+
+            if (
+                player.id ===
+                game.current_player_id
+            ) {
+
+                div.classList.add(
+                    "turn"
+                );
+            }
+
+            let crown = "";
+
+            if (player.is_hakim) {
+                crown = " 👑";
+            }
+
+            div.innerHTML = `
+                <div class="player-avatar">
+                    ${avatars[
+                        player.position % 4
+                    ]}
+                </div>
+
+                <div class="player-name">
+                    ${escapeHtml(
+                        player.name
+                    )}${crown}
+                </div>
+
+                <div class="player-info">
+                    🃏 ${player.cards_count}
+                    &nbsp; • &nbsp;
+                    🏆 ${player.tricks_won}
+                </div>
+            `;
+
+            container.appendChild(
+                div
+            );
+        }
+    }
+
+    function renderTable() {
+
+        const container =
+            document.getElementById(
+                "trickCards"
+            );
+
+        container.innerHTML = "";
+
+        for (
+            const item
+            of game.current_trick
+        ) {
+
+            const card =
+                item.card;
+
+            const div =
+                document.createElement(
+                    "div"
+                );
+
+            div.className =
+                "played-card " +
+                "pos-" +
+                item.player_position;
+
+            if (
+                card.suit === "♥" ||
+                card.suit === "♦"
+            ) {
+
+                div.classList.add(
+                    "red"
+                );
+            }
+
+            const player =
+                game.players.find(
+                    p =>
+                        p.id ===
+                        item.player_id
+                );
+
+            const name =
+                player
+                    ? player.name
+                    : "";
+
+            div.innerHTML = `
+                <div class="played-rank">
+                    ${card.rank}
+                </div>
+
+                <div class="played-suit">
+                    ${card.suit}
+                </div>
+
+                <div class="played-label">
+                    ${escapeHtml(name)}
+                </div>
+            `;
+
+            container.appendChild(
+                div
+            );
+        }
+
+        const badge =
+            document.getElementById(
+                "hokmBadge"
+            );
+
+        if (game.hokm) {
+
+            badge.textContent =
+                "حکم " +
+                game.hokm;
+
+        } else {
+
+            badge.textContent =
+                "حکم؟";
+        }
+    }
+
+    function renderHand() {
+
+        const container =
+            document.getElementById(
+                "hand"
+            );
+
+        container.innerHTML = "";
+
+        const hand =
+            game.my_hand || [];
+
+        const isMyTurn =
+            game.current_player_id ===
+            game.my_user_id;
+
+        let legalTexts = [];
+
+        if (
+            isMyTurn &&
+            game.lead_suit
+        ) {
+
+            const sameSuit =
+                hand.filter(
+                    card =>
+                        card.suit ===
+                        game.lead_suit
+                );
+
+            if (
+                sameSuit.length > 0
+            ) {
+
+                legalTexts =
+                    sameSuit.map(
+                        card =>
+                            card.text
+                    );
+
+            } else {
+
+                legalTexts =
+                    hand.map(
+                        card =>
+                            card.text
+                    );
+            }
+
+        } else {
+
+            legalTexts =
+                hand.map(
+                    card =>
+                        card.text
+                );
+        }
+
+        hand.forEach(
+            (
+                card,
+                index
+            ) => {
+
+                const button =
+                    document.createElement(
+                        "button"
+                    );
+
+                button.className =
+                    "card";
+
+                const legal =
+                    isMyTurn &&
+                    legalTexts.includes(
+                        card.text
+                    );
+
+                if (legal) {
+
+                    button.classList.add(
+                        "legal"
+                    );
+
+                    button.onclick =
+                        () =>
+                            playCard(
+                                card.text
+                            );
+
+                } else {
+
+                    button.classList.add(
+                        "not-legal"
+                    );
+                }
+
+                if (isMyTurn) {
+
+                    button.classList.add(
+                        "my-turn"
+                    );
+                }
+
+                if (
+                    card.suit === "♥" ||
+                    card.suit === "♦"
+                ) {
+
+                    button.classList.add(
+                        "red"
+                    );
+                }
+
+                button.style.zIndex =
+                    index + 1;
+
+                button.innerHTML = `
+                    <div class="card-rank">
+                        ${card.rank}
+                    </div>
+
+                    <div class="card-suit">
+                        ${card.suit}
+                    </div>
+                `;
+
+                container.appendChild(
+                    button
+                );
+            }
+        );
+    }
+
+    function renderScores() {
+
+        const container =
+            document.getElementById(
+                "scores"
+            );
+
+        container.innerHTML = "";
+
+        const score0 =
+            game.team_scores &&
+            game.team_scores[0]
+                ? game.team_scores[0]
+                : 0;
+
+        const score1 =
+            game.team_scores &&
+            game.team_scores[1]
+                ? game.team_scores[1]
+                : 0;
+
+        container.innerHTML = `
+            <div class="score">
+                تیم ۱:
+                <strong>
+                    ${score0}
+                </strong>
+            </div>
+
+            <div class="score">
+                تیم ۲:
+                <strong>
+                    ${score1}
+                </strong>
+            </div>
+        `;
+    }
+
+    function renderStartButton() {
+
+        const button =
+            document.getElementById(
+                "startButton"
+            );
+
+        const amCreator =
+            game.creator_id ===
+            game.my_user_id;
+
+        if (
+            !game.started &&
+            amCreator
+        ) {
+
+            button.style.display =
+                "block";
+
+            button.disabled =
+                game.players.length !==
+                game.max_players;
+
+        } else {
+
+            button.style.display =
+                "none";
+        }
+    }
+
+    function renderHokm() {
+
+        const panel =
+            document.getElementById(
+                "hokmPanel"
+            );
+
+        const isHakim =
+            game.hakim_id ===
+            game.my_user_id;
+
+        if (
+            game.started &&
+            !game.finished &&
+            !game.hokm &&
+            isHakim
+        ) {
+
+            panel.style.display =
+                "block";
+
+        } else {
+
+            panel.style.display =
+                "none";
+        }
+    }
+
+    function renderStatus() {
+
+        const turnText =
+            document.getElementById(
+                "turnText"
+            );
+
+        if (!game.started) {
+
+            setStatus(
+                `منتظر شروع بازی هستیم — ${game.players.length} از ${game.max_players} بازیکن`,
+                ""
+            );
+
+            turnText.textContent =
+                "بازی هنوز شروع نشده";
+
+            return;
+        }
+
+        if (game.finished) {
+
+            if (
+                game.winner_id ===
+                game.my_user_id
+            ) {
+
+                setStatus(
+                    "🏆 بازی تمام شد",
+                    "success"
+                );
+
+            } else {
+
+                setStatus(
+                    "🏁 بازی تمام شد",
+                    ""
+                );
+            }
+
+            turnText.textContent =
+                "بازی تمام شد";
+
+            return;
+        }
+
+        if (!game.hokm) {
+
+            if (
+                game.hakim_id ===
+                game.my_user_id
+            ) {
+
+                setStatus(
+                    "👑 شما حاکم هستید؛ حکم را انتخاب کنید.",
+                    ""
+                );
+
+            } else {
+
+                setStatus(
+                    "منتظر انتخاب حکم توسط حاکم...",
+                    ""
+                );
+            }
+
+            turnText.textContent =
+                "انتخاب حکم";
+
+            return;
+        }
+
+        if (
+            game.current_player_id ===
+            game.my_user_id
+        ) {
+
+            setStatus(
+                "🎯 نوبت شماست؛ یک کارت انتخاب کنید.",
+                "success"
+            );
+
+            turnText.textContent =
+                "نوبت شماست";
+
+        } else {
+
+            const player =
+                game.players.find(
+                    p =>
+                        p.id ===
+                        game.current_player_id
+                );
+
+            const name =
+                player
+                    ? player.name
+                    : "بازیکن";
+
+            setStatus(
+                `⏳ نوبت ${name} است...`,
+                ""
+            );
+
+            turnText.textContent =
+                `نوبت ${name}`;
+        }
+    }
+
+    async function startGame() {
+
+        if (!game) {
+            return;
+        }
+
+        if (
+            game.creator_id !==
+            game.my_user_id
+        ) {
+
+            setStatus(
+                "فقط سازنده بازی می‌تواند شروع کند.",
+                "error"
+            );
+
+            return;
+        }
+
+        if (
+            game.players.length !==
+            game.max_players
+        ) {
+
+            setStatus(
+                `برای شروع باید ${game.max_players} بازیکن حضور داشته باشند.`,
+                "error"
+            );
+
+            return;
+        }
+
+        showLoading(true);
+
+        try {
+
+            await api(
+                `/api/game/${gameId}/start`,
+                {
+                    method: "POST"
+                }
+            );
+
+            await loadGame(true);
+
+        } catch (error) {
+
+            setStatus(
+                translateError(
+                    error.message
+                ),
+                "error"
+            );
+
+        } finally {
+
+            showLoading(false);
+        }
+    }
+
+    async function chooseHokm(
+        suit
+    ) {
+
+        if (!game) {
+            return;
+        }
+
+        if (
+            game.hakim_id !==
+            game.my_user_id
+        ) {
+            return;
+        }
+
+        showLoading(true);
+
+        try {
+
+            await api(
+                `/api/game/${gameId}/hokm`,
+                {
+                    method: "POST",
+                    body:
+                        JSON.stringify({
+                            suit
+                        })
+                }
+            );
+
+            await loadGame(true);
+
+        } catch (error) {
+
+            setStatus(
+                translateError(
+                    error.message
+                ),
+                "error"
+            );
+
+        } finally {
+
+            showLoading(false);
+        }
+    }
+
+    async function playCard(
+        cardText
+    ) {
+
+        if (loading) {
+            return;
+        }
+
+        if (!game) {
+            return;
+        }
+
+        if (
+            game.current_player_id !==
+            game.my_user_id
+        ) {
+            return;
+        }
+
+        showLoading(true);
+
+        try {
+
+            await api(
+                `/api/game/${gameId}/play`,
+                {
+                    method: "POST",
+                    body:
+                        JSON.stringify({
+                            card:
+                                cardText
+                        })
+                }
+            );
+
+            await loadGame(true);
+
+        } catch (error) {
+
+            setStatus(
+                translateError(
+                    error.message
+                ),
+                "error"
+            );
+
+        } finally {
+
+            showLoading(false);
+        }
+    }
+
+    function translateError(
+        error
+    ) {
+
+        const messages = {
+
+            game_not_found:
+                "بازی پیدا نشد.",
+
+            not_a_player:
+                "شما بازیکن این بازی نیستید.",
+
+            creator_only:
+                "فقط سازنده بازی می‌تواند بازی را شروع کند.",
+
+            wrong_count:
+                "تعداد بازیکنان برای شروع کامل نیست.",
+
+            already_started:
+                "بازی قبلاً شروع شده.",
+
+            not_started:
+                "بازی هنوز شروع نشده.",
+
+            finished:
+                "این بازی تمام شده.",
+
+            not_your_turn:
+                "الان نوبت شما نیست.",
+
+            hokm_not_selected:
+                "هنوز حکم انتخاب نشده.",
+
+            must_follow_suit:
+                "اگر از این خال دارید، باید همان خال را بازی کنید.",
+
+            card_not_in_hand:
+                "این کارت در دست شما نیست.",
+
+            invalid_card:
+                "کارت انتخاب‌شده معتبر نیست.",
+
+            card_missing:
+                "کارت انتخاب نشده.",
+
+            not_hakim:
+                "فقط حاکم می‌تواند حکم را انتخاب کند."
+        };
+
+        return (
+            messages[error] ||
+            error ||
+            "خطایی رخ داد."
+        );
+    }
+
+    function escapeHtml(
+        value
+    ) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    gameId =
+        findGameId();
+
+    if (!gameId) {
+
+        setStatus(
+            "شناسه بازی پیدا نشد.",
+            "error"
+        );
+
+    } else {
+
+        loadGame();
+
+        setInterval(
+            () =>
+                loadGame(true),
+            1000
+        );
+    }
 
 </script>
 
