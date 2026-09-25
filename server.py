@@ -18,27 +18,43 @@ app = Flask(
 )
 
 
-def validate_telegram_init_data(init_data: str) -> dict:
-    """
-    Validate Telegram Mini App initData.
+# ============================================================
+# Telegram Mini App authentication
+# ============================================================
 
-    Telegram signs initData with a secret derived from the bot token.
-    """
+def validate_telegram_init_data(
+    init_data: str,
+) -> dict:
+
     if not init_data:
-        raise ValueError("initData is missing")
+        raise ValueError(
+            "initData is missing"
+        )
 
     settings = Settings.from_environment()
 
-    parsed = dict(parse_qsl(init_data, keep_blank_values=True))
+    parsed = dict(
+        parse_qsl(
+            init_data,
+            keep_blank_values=True,
+        )
+    )
 
-    received_hash = parsed.pop("hash", None)
+    received_hash = parsed.pop(
+        "hash",
+        None,
+    )
 
     if not received_hash:
-        raise ValueError("Telegram hash is missing")
+        raise ValueError(
+            "Telegram hash is missing"
+        )
 
     data_check_string = "\n".join(
         f"{key}={value}"
-        for key, value in sorted(parsed.items())
+        for key, value in sorted(
+            parsed.items()
+        )
     )
 
     secret_key = hmac.new(
@@ -57,15 +73,15 @@ def validate_telegram_init_data(init_data: str) -> dict:
         calculated_hash,
         received_hash,
     ):
-        raise ValueError("Invalid Telegram initData")
+        raise ValueError(
+            "Invalid Telegram initData"
+        )
 
     return parsed
 
 
 def get_current_user():
-    """
-    Read and validate the Telegram user from initData.
-    """
+
     init_data = request.headers.get(
         "X-Telegram-Init-Data",
         "",
@@ -75,18 +91,26 @@ def get_current_user():
         init_data
     )
 
-    user_json = parsed.get("user")
+    user_json = parsed.get(
+        "user"
+    )
 
     if not user_json:
         raise ValueError(
             "Telegram user information is missing"
         )
 
-    return json.loads(user_json)
+    return json.loads(
+        user_json
+    )
 
+
+# ============================================================
+# Helpers
+# ============================================================
 
 def card_to_dict(card):
-    """Convert Card object to JSON."""
+
     return {
         "rank": card.rank,
         "suit": card.suit,
@@ -94,80 +118,28 @@ def card_to_dict(card):
     }
 
 
-@app.get("/")
-def index():
-    """Serve the Telegram Mini App."""
-    return send_from_directory(
-        "web",
-        "index.html",
-    )
-
-
-@app.get("/api/health")
-def health():
-    """Simple server health check."""
-    return jsonify(
-        {
-            "ok": True,
-            "service": "hokm-greendream",
-        }
-    )
-
-
-@app.get("/api/game/<game_id>")
-def get_game(game_id: str):
-    """
-    Return the game state.
-
-    Each player receives:
-    - public player information
-    - their own cards
-    - current trick
-    - scores
-    - turn information
-
-    Other players' cards are never returned.
-    """
-    try:
-        user = get_current_user()
-    except Exception as exc:
-        return jsonify(
-            {
-                "ok": False,
-                "error": str(exc),
-            }
-        ), 401
-
-    user_id = int(user["id"])
-
-    game = game_state.get_game(game_id)
-
-    if game is None:
-        return jsonify(
-            {
-                "ok": False,
-                "error": "game_not_found",
-            }
-        ), 404
-
-    if user_id not in game.players:
-        return jsonify(
-            {
-                "ok": False,
-                "error": "not_a_player",
-            }
-        ), 403
+def game_to_dict(
+    game,
+    user_id: int,
+):
 
     players = []
 
     for player in game.players.values():
+
         players.append(
             {
                 "id": player.user_id,
                 "name": player.name,
                 "position": player.position,
-                "is_me": player.user_id == user_id,
-                "is_hakim": player.user_id == game.hakim_id,
+                "is_me": (
+                    player.user_id
+                    == user_id
+                ),
+                "is_hakim": (
+                    player.user_id
+                    == game.hakim_id
+                ),
                 "cards_count": len(
                     game.hands.get(
                         player.user_id,
@@ -181,22 +153,33 @@ def get_game(game_id: str):
             }
         )
 
-    trick = []
+    current_trick = []
 
-    for player_id, card in game.current_trick:
-        player = game.players.get(player_id)
+    for (
+        player_id,
+        card,
+    ) in game.current_trick:
+
+        player = game.players.get(
+            player_id
+        )
 
         if player is None:
             continue
 
-        trick.append(
+        current_trick.append(
             {
                 "player_id": player_id,
-                "player_position": player.position,
-                "card": card_to_dict(card),
+                "player_position": (
+                    player.position
+                ),
+                "card": card_to_dict(
+                    card
+                ),
             }
         )
 
+    # فقط دست خود بازیکن ارسال می‌شود.
     my_hand = [
         card_to_dict(card)
         for card in game.hands.get(
@@ -205,35 +188,104 @@ def get_game(game_id: str):
         )
     ]
 
+    return {
+        "id": game.game_id,
+        "creator_id": game.creator_id,
+        "started": game.started,
+        "finished": game.finished,
+        "max_players": game.max_players,
+        "hakim_id": game.hakim_id,
+        "hokm": game.hokm,
+        "current_player_id": (
+            game.current_player_id
+        ),
+        "lead_suit": game.lead_suit,
+        "winner_id": game.winner_id,
+        "team_scores": game.team_scores,
+        "players": players,
+        "current_trick": current_trick,
+        "my_hand": my_hand,
+        "my_user_id": user_id,
+    }
+
+
+def require_player(
+    game_id: str,
+    user_id: int,
+):
+
+    game = game_state.get_game(
+        game_id
+    )
+
+    if game is None:
+        return None, (
+            jsonify(
+                {
+                    "ok": False,
+                    "error": "game_not_found",
+                }
+            ),
+            404,
+        )
+
+    if user_id not in game.players:
+        return None, (
+            jsonify(
+                {
+                    "ok": False,
+                    "error": "not_a_player",
+                }
+            ),
+            403,
+        )
+
+    return game, None
+
+
+# ============================================================
+# Pages
+# ============================================================
+
+@app.get("/")
+def index():
+
+    return send_from_directory(
+        "web",
+        "index.html",
+    )
+
+
+# ============================================================
+# Health
+# ============================================================
+
+@app.get("/api/health")
+def health():
+
     return jsonify(
         {
             "ok": True,
-            "game": {
-                "id": game.game_id,
-                "started": game.started,
-                "finished": game.finished,
-                "max_players": game.max_players,
-                "hakim_id": game.hakim_id,
-                "hokm": game.hokm,
-                "current_player_id": game.current_player_id,
-                "lead_suit": game.lead_suit,
-                "winner_id": game.winner_id,
-                "team_scores": game.team_scores,
-                "players": players,
-                "current_trick": trick,
-                "my_hand": my_hand,
-                "my_user_id": user_id,
-            },
+            "service": "hokm-greendream",
         }
     )
 
 
-@app.post("/api/game/<game_id>/play")
-def play_card(game_id: str):
-    """Play a card."""
+# ============================================================
+# Get game
+# ============================================================
+
+@app.get(
+    "/api/game/<game_id>"
+)
+def get_game(game_id: str):
+
     try:
+
         user = get_current_user()
+
     except Exception as exc:
+
         return jsonify(
             {
                 "ok": False,
@@ -241,29 +293,212 @@ def play_card(game_id: str):
             }
         ), 401
 
-    user_id = int(user["id"])
+    user_id = int(
+        user["id"]
+    )
 
-    game = game_state.get_game(game_id)
+    game, error = require_player(
+        game_id,
+        user_id,
+    )
 
-    if game is None:
+    if error:
+        return error
+
+    return jsonify(
+        {
+            "ok": True,
+            "game": game_to_dict(
+                game,
+                user_id,
+            ),
+        }
+    )
+
+
+# ============================================================
+# Start game from Mini App
+# ============================================================
+
+@app.post(
+    "/api/game/<game_id>/start"
+)
+def start_game(game_id: str):
+
+    try:
+
+        user = get_current_user()
+
+    except Exception as exc:
+
         return jsonify(
             {
                 "ok": False,
-                "error": "game_not_found",
+                "error": str(exc),
             }
-        ), 404
+        ), 401
 
-    if user_id not in game.players:
+    user_id = int(
+        user["id"]
+    )
+
+    game, error = require_player(
+        game_id,
+        user_id,
+    )
+
+    if error:
+        return error
+
+    # فقط سازنده اجازه شروع دارد.
+    if game.creator_id != user_id:
+
         return jsonify(
             {
                 "ok": False,
-                "error": "not_a_player",
+                "error": "creator_only",
             }
         ), 403
 
-    data = request.get_json(
-        silent=True
-    ) or {}
+    result = game_state.start_game(
+        game_id
+    )
+
+    if result != "started":
+
+        return jsonify(
+            {
+                "ok": False,
+                "error": result,
+            }
+        ), 400
+
+    return jsonify(
+        {
+            "ok": True,
+            "game": game_to_dict(
+                game,
+                user_id,
+            ),
+        }
+    )
+
+
+# ============================================================
+# Set Hokm
+# ============================================================
+
+@app.post(
+    "/api/game/<game_id>/hokm"
+)
+def set_hokm(game_id: str):
+
+    try:
+
+        user = get_current_user()
+
+    except Exception as exc:
+
+        return jsonify(
+            {
+                "ok": False,
+                "error": str(exc),
+            }
+        ), 401
+
+    user_id = int(
+        user["id"]
+    )
+
+    game, error = require_player(
+        game_id,
+        user_id,
+    )
+
+    if error:
+        return error
+
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
+
+    suit = str(
+        data.get(
+            "suit",
+            "",
+        )
+    )
+
+    result = game_state.set_hokm(
+        game_id,
+        user_id,
+        suit,
+    )
+
+    if result != "selected":
+
+        return jsonify(
+            {
+                "ok": False,
+                "error": result,
+            }
+        ), 400
+
+    return jsonify(
+        {
+            "ok": True,
+            "hokm": suit,
+            "game": game_to_dict(
+                game,
+                user_id,
+            ),
+        }
+    )
+
+
+# ============================================================
+# Play card
+# ============================================================
+
+@app.post(
+    "/api/game/<game_id>/play"
+)
+def play_card(game_id: str):
+
+    try:
+
+        user = get_current_user()
+
+    except Exception as exc:
+
+        return jsonify(
+            {
+                "ok": False,
+                "error": str(exc),
+            }
+        ), 401
+
+    user_id = int(
+        user["id"]
+    )
+
+    game, error = require_player(
+        game_id,
+        user_id,
+    )
+
+    if error:
+        return error
+
+    data = (
+        request.get_json(
+            silent=True
+        )
+        or {}
+    )
 
     card_text = str(
         data.get(
@@ -273,6 +508,7 @@ def play_card(game_id: str):
     )
 
     if not card_text:
+
         return jsonify(
             {
                 "ok": False,
@@ -287,12 +523,19 @@ def play_card(game_id: str):
 
     card_index = None
 
-    for index, card in enumerate(hand):
+    for (
+        index,
+        card,
+    ) in enumerate(hand):
+
         if str(card) == card_text:
+
             card_index = index
+
             break
 
     if card_index is None:
+
         return jsonify(
             {
                 "ok": False,
@@ -307,6 +550,7 @@ def play_card(game_id: str):
     )
 
     if not result.get("ok"):
+
         return jsonify(
             {
                 "ok": False,
@@ -333,59 +577,20 @@ def play_card(game_id: str):
             "next_player_id": result.get(
                 "next_player_id"
             ),
+            "game": game_to_dict(
+                game,
+                user_id,
+            ),
         }
     )
 
 
-@app.post("/api/game/<game_id>/hokm")
-def set_hokm(game_id: str):
-    """Set Hokm suit."""
-    try:
-        user = get_current_user()
-    except Exception as exc:
-        return jsonify(
-            {
-                "ok": False,
-                "error": str(exc),
-            }
-        ), 401
-
-    user_id = int(user["id"])
-
-    data = request.get_json(
-        silent=True
-    ) or {}
-
-    suit = str(
-        data.get(
-            "suit",
-            "",
-        )
-    )
-
-    result = game_state.set_hokm(
-        game_id,
-        user_id,
-        suit,
-    )
-
-    if result != "selected":
-        return jsonify(
-            {
-                "ok": False,
-                "error": result,
-            }
-        ), 400
-
-    return jsonify(
-        {
-            "ok": True,
-            "hokm": suit,
-        }
-    )
-
+# ============================================================
+# Run locally / Render
+# ============================================================
 
 if __name__ == "__main__":
+
     port = int(
         os.environ.get(
             "PORT",
