@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0,
+                   maximum-scale=1.0, user-scalable=no">
+
+    <title>حکم گرین‌دریم</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background:
+                radial-gradient(circle at center, #08764c 0%, #043d2a 75%);
+            color: white;
+            font-family: Arial, Tahoma, sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 650px;
+            height: 100vh;
+            margin: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 8px 10px;
+        }
+
+        /* بالای صفحه */
+        .top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 8px 10px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .round {
+            background: rgba(0,0,0,.35);
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+        }
+
+        .score-box {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0,0,0,.35);
+            border-radius: 14px;
+            padding: 8px 14px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        /* میز */
+        .table {
+            position: relative;
+            flex: 1;
+            min-height: 430px;
+            border: 5px solid #d4a93c;
+            border-radius: 35px;
+            background:
+                radial-gradient(circle at center,
+                    #16865b 0%,
+                    #07623f 55%,
+                    #03452e 100%);
+            box-shadow:
+                inset 0 0 35px rgba(0,0,0,.35),
+                0 5px 20px rgba(0,0,0,.35);
+        }
+
+        /* بازیکنان */
+        .player {
+            position: absolute;
+            text-align: center;
+            min-width: 75px;
+        }
+
+        .player-avatar {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: auto;
+            background: #252525;
+            border: 3px solid #777;
+            box-shadow: 0 3px 10px rgba(0,0,0,.4);
+        }
+
+        .player-name {
+            background: rgba(0,0,0,.55);
+            border-radius: 15px;
+            padding: 4px 9px;
+            margin-top: 4px;
+            font-size: 12px;
+        }
+
+        .player-count {
+            font-size: 11px;
+            opacity: .8;
+            margin-top: 3px;
+        }
+
+        .hakim {
+            border-color: #e7bd4a;
+            box-shadow: 0 0 12px #e7bd4a;
+        }
+
+        .hakim-label {
+            background: #d5a72e;
+            color: #171717;
+            font-weight: bold;
+            border-radius: 12px;
+            padding: 3px 10px;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .top-player {
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .left-player {
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .right-player {
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .bottom-player {
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* حکم */
+        .hokm {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: rgba(0,0,0,.45);
+            padding: 8px 13px;
+            border-radius: 18px;
+            font-size: 14px;
+        }
+
+        /* وسط میز */
+        .center {
+            position: absolute;
+            width: 190px;
+            height: 190px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .played {
+            position: absolute;
+            width: 72px;
+            height: 100px;
+            background: white;
+            color: #111;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(0,0,0,.35);
+        }
+
+        .played.red {
+            color: #d52323;
+        }
+
+        .card-top {
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) rotate(-3deg);
+        }
+
+        .card-left {
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%) rotate(-7deg);
+        }
+
+        .card-right {
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%) rotate(7deg);
+        }
+
+        .card-bottom {
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) rotate(2deg);
+        }
+
+        .empty-message {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 13px;
+            opacity: .55;
+            white-space: nowrap;
+        }
+
+        /* نوبت */
+        .turn {
+            background: rgba(0,0,0,.55);
+            border-radius: 18px;
+            padding: 8px 15px;
+            text-align: center;
+            font-size: 13px;
+            margin: 8px auto;
+            width: fit-content;
+        }
+
+        /* کارت های من */
+        .hand-title {
+            text-align: center;
+            font-size: 13px;
+            margin: 7px 0 2px;
+        }
+
+        .hand {
+            height: 125px;
+            position: relative;
+            direction: ltr;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 3px;
+        }
+
+        .card {
+            width: 52px;
+            height: 82px;
+            background: white;
+            color: #111;
+            border: 2px solid #ddd;
+            border-radius: 7px;
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: -17px;
+            cursor: pointer;
+            box-shadow: 0 3px 7px rgba(0,0,0,.35);
+            transition: .15s;
+        }
+
+        .card:first-child {
+            margin-left: 0;
+        }
+
+        .card.red {
+            color: #d21d1d;
+        }
+
+        .card:hover,
+        .card:active {
+            transform: translateY(-18px);
+            z-index: 50;
+        }
+
+        .status {
+            text-align: center;
+            min-height: 25px;
+            font-size: 13px;
+            color: #c9ffe5;
+        }
+
+        @media (max-width: 400px) {
+            .table {
+                min-height: 390px;
+            }
+
+            .played {
+                width: 62px;
+                height: 88px;
+                font-size: 20px;
+            }
+
+            .center {
+                width: 165px;
+                height: 165px;
+            }
+
+            .card {
+                width: 45px;
+                height: 74px;
+                margin-left: -18px;
+            }
+
+            .hand {
+                height: 115px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="top">
+        <div class="title">🃏 حکم گرین‌دریم</div>
+        <div class="round">دست ۱</div>
+    </div>
+
+    <div class="score-box">
+        <span>🟢 تیم شما: <b id="myScore">0</b></span>
+        <span>🔴 حریف: <b id="enemyScore">0</b></span>
+        <span>🎴 باقی‌مانده: <b id="remaining">13</b></span>
+    </div>
+
+    <div class="table">
+
+        <div class="hokm">
+            حکم: <b>♠</b>
+        </div>
+
+        <!-- بازیکن بالا -->
+        <div class="player top-player">
+            <div class="hakim-label">👑 حاکم</div>
+            <div class="player-avatar hakim">🐴</div>
+            <div class="player-name">احمدرضا</div>
+            <div class="player-count">🂠 13 کارت</div>
+        </div>
+
+        <!-- بازیکن چپ -->
+        <div class="player left-player">
+            <div class="player-avatar">🐱</div>
+            <div class="player-name">بازیکن ۲</div>
+            <div class="player-count">🂠 13 کارت</div>
+        </div>
+
+        <!-- بازیکن راست -->
+        <div class="player right-player">
+            <div class="player-avatar">🐯</div>
+            <div class="player-name">امیر</div>
+            <div class="player-count">🂠 13 کارت</div>
+        </div>
+
+        <!-- وسط -->
+        <div class="center">
+
+            <div class="empty-message" id="emptyMessage">
+                منتظر بازی...
+            </div>
+
+            <div class="played card-top" id="topCard"
+                 style="display:none;"></div>
+
+            <div class="played card-left" id="leftCard"
+                 style="display:none;"></div>
+
+            <div class="played card-right" id="rightCard"
+                 style="display:none;"></div>
+
+            <div class="played card-bottom" id="bottomCard"
+                 style="display:none;"></div>
+
+        </div>
+
+        <!-- بازیکن خودم -->
+        <div class="player bottom-player">
+            <div class="player-avatar" style="border-color:#67e0b0;">
+                🦉
+            </div>
+            <div class="player-name">شما</div>
+            <div class="player-count">
+                🂠 <span id="myCardsCount">13</span> کارت
+            </div>
+        </div>
+
+    </div>
+
+    <div class="turn" id="turn">
+        🟢 نوبت شماست
+    </div>
+
+    <div class="hand-title">
+        کارت‌های شما
+    </div>
+
+    <div class="hand" id="hand"></div>
+
+    <div class="status" id="status">
+        یک کارت را انتخاب کنید
+    </div>
+
+</div>
+
+<script>
+
+    /*
+       فعلاً این کارت‌ها نمونه هستند.
+       بعداً همین قسمت مستقیماً از game.py
+       اطلاعات واقعی را دریافت می‌کند.
+    */
+
+    let myCards = [
+        "A♠",
+        "Q♠",
+        "J♥",
+        "6♥",
+        "A♣",
+        "K♣",
+        "J♣",
+        "8♣",
+        "4♣",
+        "A♦",
+        "10♦",
+        "8♦",
+        "3♦"
+    ];
+
+    const hand = document.getElementById("hand");
+    const status = document.getElementById("status");
+    const turn = document.getElementById("turn");
+    const remaining = document.getElementById("remaining");
+    const myCardsCount = document.getElementById("myCardsCount");
+
+    function renderCards() {
+
+        hand.innerHTML = "";
+
+        myCards.forEach((card, index) => {
+
+            const button = document.createElement("button");
+
+            button.className = "card";
+
+            if (
+                card.includes("♥") ||
+                card.includes("♦")
+            ) {
+                button.classList.add("red");
+            }
+
+            button.textContent = card;
+
+            button.onclick = function () {
+                playCard(index);
+            };
+
+            hand.appendChild(button);
+        });
+
+        remaining.textContent = myCards.length;
+        myCardsCount.textContent = myCards.length;
+    }
+
+
+    function playCard(index) {
+
+        const card = myCards[index];
+
+        if (!card) return;
+
+        /*
+           فعلاً فقط نمایش آزمایشی.
+           بعداً اینجا درخواست به سرور ارسال می‌شود.
+        */
+
+        myCards.splice(index, 1);
+
+        const bottomCard =
+            document.getElementById("bottomCard");
+
+        bottomCard.textContent = card;
+        bottomCard.style.display = "flex";
+
+        document.getElementById("emptyMessage")
+            .style.display = "none";
+
+        status.textContent =
+            "شما " + card + " را بازی کردید";
+
+        turn.textContent =
+            "⏳ منتظر بازیکن بعدی...";
+
+        renderCards();
+    }
+
+
+    /*
+       فعال کردن Telegram Mini App
+    */
+
+    if (window.Telegram &&
+        window.Telegram.WebApp) {
+
+        const tg = window.Telegram.WebApp;
+
+        tg.ready();
+        tg.expand();
+
+        /*
+           بعداً اینجا اطلاعات واقعی
+           بازی و بازیکن دریافت می‌شود.
+        */
+    }
+
+
+    renderCards();
+
+</script>
+
+</body>
+</html>
