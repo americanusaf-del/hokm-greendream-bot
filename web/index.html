@@ -2,1245 +2,831 @@
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+>
 
 <title>حکم گرین‌دریم</title>
 
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap');
 
-/* =========================================================
-   RESET
-========================================================= */
+:root{
+    --gold:#d8bd61;
+    --gold2:#a8892e;
+    --green:#075b43;
+    --green2:#063b2f;
+    --dark:#061512;
+    --panel:#0d211c;
+    --text:#f3f1df;
+    --muted:#9caea8;
+    --red:#d83d42;
+}
 
 *{
     box-sizing:border-box;
     -webkit-tap-highlight-color:transparent;
 }
 
-html{
-    width:100%;
-    height:100%;
+html,
+body{
     margin:0;
     padding:0;
-    overflow:hidden;
-}
-
-body{
     width:100%;
     height:100%;
     min-height:100%;
-    margin:0;
-    padding:0;
-    overflow:hidden !important;
+    overflow:hidden;
+    background:#06110e;
+    font-family:"Vazirmatn",Tahoma,Arial,sans-serif;
+}
 
-    background:#08100d;
-    color:#fff;
-
-    font-family:Tahoma,Arial,sans-serif;
-
+body{
+    color:var(--text);
     overscroll-behavior:none;
-    position:fixed;
-    inset:0;
 }
 
 button{
     font-family:inherit;
 }
 
-
-/* =========================================================
-   VARIABLES
-========================================================= */
-
-:root{
-    --gold:#d5a63e;
-    --gold2:#f1cb6c;
-    --gold-dark:#8d6425;
-
-    --green:#075b3b;
-    --green2:#08764b;
-
-    --panel:#101915;
-    --panel2:#16221d;
-
-    --muted:#a9b4ae;
-
-    --red:#e33b3b;
-}
-
-
-/* =========================================================
-   MAIN PAGE
-========================================================= */
-
 .page{
     width:100%;
-    max-width:620px;
-
     height:100dvh;
+    min-height:100dvh;
     max-height:100dvh;
+    overflow:hidden;
 
-    min-height:0;
-
-    margin:0 auto;
+    display:flex;
+    flex-direction:column;
 
     padding:
-        env(safe-area-inset-top)
-        7px
-        env(safe-area-inset-bottom)
-        7px;
+        max(4px, env(safe-area-inset-top))
+        8px
+        max(4px, env(safe-area-inset-bottom));
 
     background:
-        radial-gradient(
-            circle at 50% 28%,
-            rgba(16,108,70,.22),
-            transparent 42%
-        ),
-        linear-gradient(
-            #0c1411,
-            #07100d 75%
-        );
-
-    overflow:hidden;
+        radial-gradient(circle at 50% 0%, #15362c 0%, #071612 42%, #030b09 100%);
 }
 
-
-/* =========================================================
-   GAME HEADER
-========================================================= */
+/* ---------------- HEADER ---------------- */
 
 .game-head{
-    height:76px;
+    height:54px;
+    min-height:54px;
 
-    padding:5px 4px 3px;
-
-    display:grid;
-
-    grid-template-columns:50px 1fr 50px;
-
+    display:flex;
     align-items:center;
+    justify-content:space-between;
 
-    gap:4px;
-
-    flex-shrink:0;
+    padding:0 8px;
 }
 
-.head-side{
+.brand{
+    text-align:center;
+    flex:1;
+}
+
+.brand h1{
+    margin:0;
+    font-size:21px;
+    font-weight:900;
+    letter-spacing:-.8px;
+    color:#f3ead0;
+
+    text-shadow:
+        0 2px 10px rgba(0,0,0,.7);
+}
+
+.brand p{
+    margin:0;
+    margin-top:-2px;
+    font-size:9px;
+    color:#8c9c95;
+}
+
+.head-btn{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+
+    border:1px solid rgba(214,187,91,.55);
+    background:rgba(10,28,23,.85);
+
+    color:#d8c57d;
+    font-size:20px;
+
     display:flex;
+    align-items:center;
     justify-content:center;
 }
 
-.icon-btn{
-    width:38px;
-    height:38px;
-
-    border-radius:50%;
-
-    border:1px solid rgba(226,191,103,.5);
-
-    background:
-        linear-gradient(
-            145deg,
-            #1c2822,
-            #0d1512
-        );
-
-    color:#d9c07d;
-
-    box-shadow:
-        0 4px 12px rgba(0,0,0,.28),
-        inset 0 1px rgba(255,255,255,.08);
-
-    font-size:18px;
-
-    cursor:pointer;
-}
-
-.game-title{
-    text-align:center;
-    line-height:1.05;
-}
-
-.game-title strong{
-    display:block;
-
-    font-size:21px;
-    font-weight:900;
-
-    letter-spacing:-.5px;
-}
-
-.game-title span{
-    display:block;
-
-    margin-top:3px;
-
-    color:#c5cbc8;
-
-    font-size:10px;
-}
-
-.round-pill{
-    display:inline-flex;
-
-    margin-top:4px;
-
-    padding:3px 10px;
-
-    border-radius:14px;
-
-    background:#111a16;
-
-    border:1px solid rgba(255,255,255,.08);
-
-    color:#d8dedb;
-
-    font-size:9px;
-}
-
-
-/* =========================================================
-   SCORE
-========================================================= */
+/* ---------------- SCORE ---------------- */
 
 .score-row{
+    height:43px;
+    min-height:43px;
+
     display:grid;
+    grid-template-columns:1fr 70px 1fr;
+    gap:7px;
 
-    grid-template-columns:1fr auto 1fr;
-
-    align-items:center;
-
-    gap:6px;
-
-    margin:0 6px 6px;
-
-    flex-shrink:0;
+    margin:0 5px 6px;
 }
 
 .score-box{
-    min-height:37px;
-
-    padding:5px 9px;
-
-    border-radius:14px;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:18px;
 
     background:
         linear-gradient(
-            145deg,
-            #19231f,
-            #101713
+            180deg,
+            rgba(26,48,42,.9),
+            rgba(8,25,20,.9)
         );
 
-    border:1px solid rgba(255,255,255,.07);
-
-    box-shadow:0 5px 14px rgba(0,0,0,.2);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.04),
+        0 5px 12px rgba(0,0,0,.22);
 
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
 
-    gap:7px;
-
-    font-size:10px;
+    padding:0 13px;
 }
 
-.score-box .score{
-    color:var(--gold2);
+.score-box span{
+    font-size:11px;
+    color:#d5d6ca;
+}
 
-    font-size:15px;
-
-    font-weight:900;
+.score-box strong{
+    color:#e9cb61;
+    font-size:18px;
 }
 
 .score-center{
-    width:46px;
-    height:27px;
-
-    border-radius:15px;
+    border-radius:18px;
 
     display:flex;
-
     align-items:center;
-
     justify-content:center;
 
-    background:#1d2822;
+    background:rgba(255,255,255,.035);
+    border:1px solid rgba(255,255,255,.05);
 
-    color:#d5ddd9;
-
-    border:1px solid rgba(255,255,255,.07);
-
-    font-size:9px;
+    color:#a8b1ac;
+    font-size:10px;
 }
 
-
-/* =========================================================
-   TABLE
-========================================================= */
+/* ---------------- TABLE ---------------- */
 
 .table{
     position:relative;
 
-    width:100%;
+    flex:1;
+    min-height:0;
 
-    /*
-       ارتفاع میز خودش با صفحه هماهنگ می‌شود
-    */
-    height:calc(100dvh - 270px);
+    margin:0 1px;
 
-    min-height:480px;
+    border-radius:34px;
 
-    max-height:660px;
-
-    border-radius:38px;
-
-    border:5px solid var(--gold);
+    border:6px solid #b99838;
 
     background:
         radial-gradient(
-            ellipse at 50% 48%,
-            #16865a 0%,
-            #0c6c47 43%,
-            #075239 76%,
-            #043827 100%
+            ellipse at center,
+            #0b8c62 0%,
+            #087653 30%,
+            #075b43 62%,
+            #043d2f 100%
         );
 
     box-shadow:
-        0 0 0 2px #6d4a19,
-        0 0 0 5px rgba(237,195,90,.08),
-        inset 0 0 0 2px rgba(247,211,120,.28),
-        inset 0 0 70px rgba(0,0,0,.35),
-        0 18px 45px rgba(0,0,0,.48);
+        0 0 0 3px #55491f,
+        0 0 0 6px #d4b64d,
+        inset 0 0 0 2px rgba(255,255,255,.12),
+        inset 0 0 60px rgba(0,0,0,.3),
+        0 14px 35px rgba(0,0,0,.5);
 
     overflow:hidden;
-
-    flex-shrink:0;
 }
 
-.table:before{
+/* خطوط ظریف میز */
+
+.table::before{
     content:"";
-
     position:absolute;
+    inset:15px;
 
-    inset:10px;
+    border-radius:26px;
 
-    border-radius:31px;
-
-    border:1px solid rgba(245,211,123,.16);
-
-    box-shadow:
-        inset 0 0 30px rgba(0,0,0,.13);
+    border:1px solid rgba(222,196,100,.18);
 
     pointer-events:none;
 }
 
-.table:after{
+.table::after{
     content:"";
-
     position:absolute;
+    width:65%;
+    height:45%;
 
-    inset:0;
+    left:17.5%;
+    top:27%;
 
-    background:
-        radial-gradient(
-            circle at 50% 52%,
-            rgba(255,255,255,.035),
-            transparent 38%
-        ),
-        repeating-radial-gradient(
-            ellipse at center,
-            rgba(255,255,255,.012) 0 1px,
-            transparent 1px 7px
-        );
-
-    opacity:.55;
+    background:radial-gradient(
+        ellipse,
+        rgba(91,232,172,.08),
+        transparent 70%
+    );
 
     pointer-events:none;
 }
 
-
-/* =========================================================
-   TABLE TOP
-========================================================= */
+/* ---------------- TOP INFO ---------------- */
 
 .table-top{
     position:absolute;
-
-    top:10px;
+    top:12px;
     left:14px;
     right:14px;
 
-    z-index:10;
-
     display:flex;
-
     justify-content:space-between;
+    align-items:center;
 
-    align-items:flex-start;
+    z-index:20;
+}
+
+.status-pill{
+    padding:8px 13px;
+
+    border-radius:20px;
+
+    background:rgba(3,30,23,.78);
+    border:1px solid rgba(255,255,255,.05);
+
+    color:#d7ded8;
+    font-size:10px;
+
+    box-shadow:0 5px 12px rgba(0,0,0,.18);
 }
 
 .hokm-pill{
-    min-width:92px;
-
-    padding:6px 10px;
-
-    border-radius:20px;
-
-    background:rgba(12,28,22,.8);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    box-shadow:0 4px 12px rgba(0,0,0,.18);
-
-    color:#ead79f;
-
-    font-size:10px;
-
+    min-width:105px;
     text-align:center;
-}
 
-.hokm-pill b{
-    color:#fff;
-
-    font-size:16px;
-
-    margin-left:3px;
-}
-
-.turn-pill{
-    max-width:145px;
-
-    padding:6px 10px;
+    padding:8px 13px;
 
     border-radius:20px;
 
-    background:rgba(12,28,22,.8);
+    background:rgba(3,30,23,.78);
+    border:1px solid rgba(255,255,255,.05);
 
-    border:1px solid rgba(255,255,255,.08);
+    color:#e7d28b;
+    font-size:11px;
 
-    color:#e9eeeb;
-
-    font-size:9px;
-
-    white-space:nowrap;
-
-    overflow:hidden;
-
-    text-overflow:ellipsis;
+    box-shadow:0 5px 12px rgba(0,0,0,.18);
 }
 
-
-/* =========================================================
-   SEATS
-========================================================= */
+/* ---------------- PLAYERS ---------------- */
 
 .seat{
     position:absolute;
-
-    z-index:12;
+    z-index:15;
 
     display:flex;
-
     flex-direction:column;
-
     align-items:center;
 
-    width:105px;
-
-    transition:all .2s ease;
+    min-width:78px;
 }
 
 .seat.top{
-    top:25px;
-
+    top:48px;
     left:50%;
-
     transform:translateX(-50%);
 }
 
 .seat.left{
-    top:43%;
-
-    left:4px;
+    left:7px;
+    top:50%;
+    transform:translateY(-50%);
 }
 
 .seat.right{
-    top:43%;
-
-    right:4px;
-}
-
-.seat.bottom{
-    display:none;
+    right:7px;
+    top:50%;
+    transform:translateY(-50%);
 }
 
 .avatar{
-    position:relative;
-
-    width:56px;
-    height:56px;
+    width:62px;
+    height:62px;
 
     border-radius:50%;
 
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
+    border:3px solid rgba(205,224,211,.45);
 
     background:
-        radial-gradient(
-            circle at 35% 30%,
-            #6b7b77,
-            #27332f 68%
+        radial-gradient(circle at 35% 25%,
+            #7cae99,
+            #346c5a 55%,
+            #183e34 100%
         );
 
-    border:3px solid #7dd2ae;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 
-    box-shadow:
-        0 0 0 2px rgba(0,0,0,.3),
-        0 6px 16px rgba(0,0,0,.28);
-
-    color:#fff;
-
-    font-size:24px;
-
-    font-weight:900;
-}
-
-.seat.top .avatar{
-    border-color:var(--gold2);
-}
-
-.seat.turn .avatar{
-    box-shadow:
-        0 0 0 3px rgba(239,194,83,.2),
-        0 0 20px rgba(239,194,83,.55),
-        0 7px 18px rgba(0,0,0,.3);
-}
-
-.seat-name{
-    max-width:100px;
-
-    margin-top:5px;
-
-    padding:4px 10px;
-
-    border-radius:16px;
-
-    background:rgba(10,25,19,.88);
-
-    border:1px solid rgba(255,255,255,.06);
-
-    box-shadow:0 4px 10px rgba(0,0,0,.18);
+    font-size:23px;
+    font-weight:800;
 
     color:#e8eee9;
 
-    font-family:Georgia,serif;
+    box-shadow:
+        0 4px 10px rgba(0,0,0,.35),
+        inset 0 0 12px rgba(255,255,255,.08);
+}
 
-    font-style:italic;
+.player-name{
+    margin-top:6px;
 
-    font-weight:700;
+    max-width:115px;
 
-    font-size:11px;
+    padding:5px 10px;
 
+    border-radius:14px;
+
+    background:rgba(2,33,25,.72);
+
+    color:#d8dfd9;
+
+    font-size:10px;
     white-space:nowrap;
-
     overflow:hidden;
-
     text-overflow:ellipsis;
+
+    text-align:center;
 }
 
-.seat-meta{
-    margin-top:3px;
+.player-meta{
+    margin-top:2px;
 
-    padding:3px 7px;
-
-    border-radius:13px;
-
-    background:rgba(8,20,15,.72);
-
-    color:#b8c1bc;
-
+    color:rgba(226,234,228,.62);
     font-size:8px;
-
-    min-height:17px;
 }
 
-.crown{
+/* ---------------- AHORAMEHR CENTER ---------------- */
+
+.ahuramehr{
     position:absolute;
 
-    top:-12px;
-    right:-8px;
+    left:50%;
+    top:50%;
 
-    min-width:48px;
+    transform:translate(-50%,-50%);
 
-    padding:3px 6px;
+    z-index:5;
 
-    border-radius:13px;
+    text-align:center;
 
-    background:
-        linear-gradient(
-            145deg,
-            #f1ca65,
-            #b17c24
-        );
+    pointer-events:none;
 
-    color:#251a08;
+    width:100%;
+}
 
-    font-size:8px;
+.ahuramehr-title{
+    font-family:
+        "Vazirmatn",
+        "B Titr",
+        "Tahoma",
+        sans-serif;
+
+    font-size:clamp(24px,7vw,38px);
 
     font-weight:900;
 
-    box-shadow:0 4px 9px rgba(0,0,0,.28);
+    letter-spacing:-1.5px;
 
-    border:1px solid #f5dc8c;
+    color:#e6cf77;
+
+    text-shadow:
+        0 2px 0 #715d24,
+        0 4px 10px rgba(0,0,0,.55),
+        0 0 22px rgba(220,190,86,.22);
 }
 
-.empty-seat{
-    opacity:.45;
+.ahuramehr-line{
+    width:75px;
+    height:2px;
+
+    margin:7px auto 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            #d6bd68,
+            transparent
+        );
+
+    opacity:.75;
 }
 
+.ahuramehr-sub{
+    margin-top:5px;
 
-/* =========================================================
-   CENTER
-========================================================= */
+    font-size:8px;
+
+    color:rgba(235,227,193,.52);
+
+    letter-spacing:1px;
+}
+
+/* ---------------- TRICK ---------------- */
 
 .center{
     position:absolute;
 
-    z-index:7;
+    left:50%;
+    top:50%;
 
-    top:29%;
+    transform:translate(-50%,-50%);
 
+    width:145px;
+    height:145px;
+
+    z-index:10;
+
+    pointer-events:none;
+}
+
+.center-label{
+    position:absolute;
+
+    top:0;
     left:50%;
 
-    width:215px;
-    height:230px;
-
     transform:translateX(-50%);
-}
 
-.trick-label{
-    text-align:center;
+    font-size:9px;
+    color:rgba(236,239,227,.48);
 
-    color:rgba(255,255,255,.45);
-
-    font-size:8px;
-
-    margin-bottom:4px;
-}
-
-.trick{
-    position:relative;
-
-    width:190px;
-    height:180px;
-
-    margin:auto;
+    white-space:nowrap;
 }
 
 .played{
     position:absolute;
 
-    width:65px;
-    height:91px;
+    width:55px;
+    height:76px;
 
-    border-radius:9px;
+    border-radius:8px;
 
-    background:
-        linear-gradient(
-            145deg,
-            #fff,
-            #f1eee7 58%,
-            #e7e2d8
-        );
+    background:#f8f5e9;
 
-    border:1px solid #c9c3b8;
+    border:1px solid rgba(0,0,0,.22);
 
-    color:#151515;
-
-    box-shadow:
-        0 8px 15px rgba(0,0,0,.36);
+    box-shadow:0 5px 10px rgba(0,0,0,.35);
 
     display:flex;
-
-    flex-direction:column;
-
     align-items:center;
-
     justify-content:center;
 
-    font-family:Arial,sans-serif;
+    font-size:25px;
 
-    font-weight:900;
-
-    transform-origin:center;
-}
-
-.played.red{
-    color:#d42525;
-}
-
-.played .rank{
-    font-size:22px;
-
-    line-height:1;
-
-    font-family:Georgia,serif;
-}
-
-.played .suit{
-    font-size:27px;
-
-    line-height:1;
-
-    margin-top:6px;
+    color:#1b2924;
 }
 
 .played.p1{
-    top:0;
-    left:62px;
-
-    transform:rotate(-2deg);
+    top:22px;
+    left:45px;
 }
 
 .played.p2{
     top:45px;
-    right:0;
-
-    transform:rotate(5deg);
+    right:2px;
 }
 
 .played.p3{
     bottom:0;
-    left:62px;
-
-    transform:rotate(2deg);
+    left:45px;
 }
 
 .played.p4{
     top:45px;
-    left:0;
-
-    transform:rotate(-5deg);
+    left:2px;
 }
 
-.hokm-center{
-    width:76px;
-
-    margin:4px auto 0;
-
-    padding:6px 8px;
-
-    border-radius:20px;
-
-    text-align:center;
-
-    background:
-        linear-gradient(
-            145deg,
-            #d7aa48,
-            #976b24
-        );
-
-    border:1px solid #f0cf78;
-
-    box-shadow:
-        0 5px 14px rgba(0,0,0,.35);
-
-    color:#fff;
-
-    font-size:10px;
-
-    font-weight:900;
+.played.red{
+    color:#c52f35;
 }
 
-.hokm-center.empty{
-    opacity:.6;
-}
-
-
-/* =========================================================
-   TIMER
-========================================================= */
+/* ---------------- TIMER ---------------- */
 
 .timer{
     position:absolute;
 
-    left:13px;
+    left:14px;
+    bottom:14px;
 
-    bottom:13px;
-
-    z-index:12;
-
-    min-width:100px;
-
-    padding:6px 9px;
-
-    border-radius:20px;
-
-    background:rgba(9,26,20,.84);
-
-    border:1px solid rgba(255,255,255,.08);
-
-    color:#dce5e0;
-
-    font-size:9px;
-
-    text-align:center;
-}
-
-.timer b{
-    color:var(--gold2);
-
-    font-size:14px;
-
-    margin-right:3px;
-}
-
-
-/* =========================================================
-   PLAYER STRIP
-========================================================= */
-
-.my-strip{
-    display:flex;
-
-    align-items:center;
-
-    justify-content:space-between;
-
-    gap:7px;
-
-    margin:6px 10px 0;
-
-    min-height:46px;
-
-    flex-shrink:0;
-}
-
-.my-player{
-    display:flex;
-
-    align-items:center;
-
-    gap:7px;
-
-    direction:rtl;
-}
-
-.my-avatar{
-    width:43px;
-    height:43px;
-
-    border-radius:50%;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    background:
-        radial-gradient(
-            circle at 35% 30%,
-            #71807b,
-            #27332e
-        );
-
-    border:2px solid #81d7b1;
-
-    box-shadow:
-        0 0 0 2px rgba(0,0,0,.25),
-        0 5px 13px rgba(0,0,0,.3);
-
-    font-size:19px;
-}
-
-.my-name{
-    color:#79ddb5;
-
-    font-family:Georgia,serif;
-
-    font-style:italic;
-
-    font-weight:700;
-
-    font-size:15px;
-}
-
-.waiting{
-    padding:7px 10px;
+    padding:7px 13px;
 
     border-radius:18px;
 
-    background:#111a16;
+    background:rgba(2,32,25,.82);
 
-    color:#c5cdc8;
+    color:#e0ca72;
 
     font-size:9px;
 
-    border:1px solid rgba(255,255,255,.05);
+    z-index:25;
 }
 
+/* ---------------- MY PLAYER ---------------- */
 
-/* =========================================================
-   HAND
-========================================================= */
+.my-strip{
+    position:absolute;
+
+    left:50%;
+    bottom:112px;
+
+    transform:translateX(-50%);
+
+    z-index:40;
+
+    display:flex;
+    align-items:center;
+    gap:7px;
+
+    padding:5px 11px;
+
+    border-radius:18px;
+
+    background:rgba(2,30,23,.83);
+
+    border:1px solid rgba(220,195,102,.16);
+
+    white-space:nowrap;
+}
+
+.my-avatar{
+    width:28px;
+    height:28px;
+
+    border-radius:50%;
+
+    background:#5f8d7c;
+
+    border:1px solid rgba(255,255,255,.25);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:11px;
+    font-weight:800;
+}
+
+.my-name{
+    font-size:10px;
+    color:#e7e5d4;
+}
+
+/* ---------------- HAND ---------------- */
 
 .hand-wrap{
-    position:relative;
+    position:absolute;
 
-    height:125px;
+    left:5px;
+    right:5px;
+    bottom:5px;
 
-    margin:0 -2px;
+    height:92px;
+
+    z-index:50;
 
     overflow:visible;
 
-    flex-shrink:0;
+    pointer-events:none;
 }
 
 .hand{
     position:absolute;
 
     left:50%;
-
-    bottom:-2px;
-
-    width:100%;
-
-    height:120px;
+    bottom:0;
 
     transform:translateX(-50%);
 
-    display:flex;
+    height:92px;
 
+    width:100%;
+
+    display:flex;
+    justify-content:center;
     align-items:flex-end;
 
-    justify-content:center;
-
-    padding:0 3px;
-
-    overflow:visible;
-
-    direction:ltr;
+    pointer-events:none;
 }
 
-
-/* =========================================================
-   CARDS
-========================================================= */
+/* کارت */
 
 .card{
     position:relative;
 
-    flex:0 0 clamp(43px,10.2vw,60px);
+    flex:0 0 clamp(34px,9.7vw,46px);
 
-    width:clamp(43px,10.2vw,60px);
+    width:clamp(34px,9.7vw,46px);
 
-    height:clamp(75px,21.5vw,102px);
+    height:clamp(64px,18.8vw,82px);
 
-    margin-left:clamp(-15px,-2.8vw,-7px);
+    margin-left:clamp(-13px,-2.8vw,-7px);
 
-    border-radius:9px;
-
-    border:1px solid #c9c3b8;
+    border-radius:8px;
 
     background:
         linear-gradient(
-            135deg,
-            rgba(255,255,255,.98),
-            rgba(249,247,241,.98) 55%,
-            rgba(229,225,216,.98)
+            145deg,
+            #fffefa,
+            #eeeade
         );
 
-    color:#151515;
+    border:1px solid rgba(0,0,0,.25);
 
     box-shadow:
-        0 7px 14px rgba(0,0,0,.55),
-        0 2px 3px rgba(0,0,0,.35),
-        inset 0 0 0 1px rgba(255,255,255,.9);
+        0 5px 8px rgba(0,0,0,.32),
+        inset 0 0 0 1px rgba(255,255,255,.7);
+
+    color:#202a26;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    pointer-events:auto;
 
     cursor:pointer;
 
-    overflow:hidden;
-
-    transform-origin:50% 108%;
-
     transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        filter .18s ease;
-
-    user-select:none;
+        transform .15s ease,
+        filter .15s ease;
 }
 
 .card:first-child{
     margin-left:0;
 }
 
-.card:before{
-    content:"";
-
-    position:absolute;
-
-    inset:3px;
-
-    border:1px solid rgba(160,154,143,.55);
-
-    border-radius:7px;
-
-    pointer-events:none;
-}
-
 .card.red{
-    color:#c91d2b;
+    color:#c82f38;
 }
 
-.card-corner{
+.card.disabled{
+    filter:brightness(.52) saturate(.5);
+    cursor:default;
+}
+
+.card:not(.disabled):active{
+    transform:translateY(-12px) scale(1.03) !important;
+}
+
+.card-rank{
     position:absolute;
 
-    left:5px;
     top:4px;
-
-    width:16px;
-
-    display:flex;
-
-    flex-direction:column;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-family:Georgia,"Times New Roman",serif;
-
-    font-weight:900;
-
-    line-height:.92;
-
-    z-index:3;
-}
-
-.card-corner.bottom{
-    left:auto;
-
-    top:auto;
-
     right:5px;
 
+    font-size:11px;
+    font-weight:800;
+
+    line-height:1;
+}
+
+.card-suit{
+    font-size:24px;
+
+    transform:translateY(2px);
+}
+
+.card-bottom{
+    position:absolute;
+
     bottom:4px;
+    left:5px;
+
+    font-size:9px;
 
     transform:rotate(180deg);
 }
 
-.card-corner .rank{
-    font-size:clamp(12px,3.3vw,17px);
-}
+/* fan */
 
-.card-corner .mini-suit{
-    margin-top:2px;
+.card:nth-child(1){transform:rotate(-10deg) translateY(3px);}
+.card:nth-child(2){transform:rotate(-8deg) translateY(1px);}
+.card:nth-child(3){transform:rotate(-6deg) translateY(-1px);}
+.card:nth-child(4){transform:rotate(-4deg);}
+.card:nth-child(5){transform:rotate(-2deg);}
+.card:nth-child(6){transform:rotate(-1deg);}
+.card:nth-child(7){transform:rotate(0deg) translateY(-2px);}
+.card:nth-child(8){transform:rotate(1deg);}
+.card:nth-child(9){transform:rotate(2deg);}
+.card:nth-child(10){transform:rotate(4deg);}
+.card:nth-child(11){transform:rotate(6deg) translateY(-1px);}
+.card:nth-child(12){transform:rotate(8deg) translateY(1px);}
+.card:nth-child(13){transform:rotate(10deg) translateY(3px);}
 
-    font-size:clamp(9px,2.5vw,12px);
-}
+/* ---------------- CONTROLS ---------------- */
 
-.card-center-suit{
+.controls{
     position:absolute;
 
     left:50%;
-    top:53%;
+    bottom:103px;
 
-    transform:translate(-50%,-50%);
+    transform:translateX(-50%);
 
-    font-size:clamp(27px,7.5vw,44px);
+    z-index:60;
 
-    line-height:1;
-
-    font-family:"Times New Roman",serif;
-
-    text-shadow:
-        0 1px 0 rgba(0,0,0,.05);
-
-    z-index:2;
-}
-
-.card.selected{
-    transform:
-        translateY(-25px)
-        rotate(0deg)!important;
-
-    z-index:100!important;
-
-    box-shadow:
-        0 18px 28px rgba(0,0,0,.62),
-        0 0 0 2px var(--gold2),
-        0 0 18px rgba(241,203,108,.3);
-}
-
-.card.disabled{
-    opacity:.38;
-
-    filter:
-        saturate(.35)
-        brightness(.9);
-}
-
-
-/* =========================================================
-   CARD FAN
-========================================================= */
-
-.card:nth-child(1){
-    transform:rotate(-16deg) translateY(10px);
-    z-index:1;
-}
-
-.card:nth-child(2){
-    transform:rotate(-13deg) translateY(6px);
-    z-index:2;
-}
-
-.card:nth-child(3){
-    transform:rotate(-10deg) translateY(3px);
-    z-index:3;
-}
-
-.card:nth-child(4){
-    transform:rotate(-7deg) translateY(1px);
-    z-index:4;
-}
-
-.card:nth-child(5){
-    transform:rotate(-4deg) translateY(-2px);
-    z-index:5;
-}
-
-.card:nth-child(6){
-    transform:rotate(-2deg) translateY(-3px);
-    z-index:6;
-}
-
-.card:nth-child(7){
-    transform:rotate(0deg) translateY(-4px);
-    z-index:7;
-}
-
-.card:nth-child(8){
-    transform:rotate(2deg) translateY(-3px);
-    z-index:8;
-}
-
-.card:nth-child(9){
-    transform:rotate(4deg) translateY(-2px);
-    z-index:9;
-}
-
-.card:nth-child(10){
-    transform:rotate(7deg) translateY(1px);
-    z-index:10;
-}
-
-.card:nth-child(11){
-    transform:rotate(10deg) translateY(3px);
-    z-index:11;
-}
-
-.card:nth-child(12){
-    transform:rotate(13deg) translateY(6px);
-    z-index:12;
-}
-
-.card:nth-child(13){
-    transform:rotate(16deg) translateY(10px);
-    z-index:13;
-}
-
-
-/* =========================================================
-   CONTROLS
-========================================================= */
-
-.controls{
     display:flex;
-
+    align-items:center;
     justify-content:center;
 
     gap:6px;
-
-    margin:3px 0 0;
-
-    flex-shrink:0;
 }
 
-.btn{
-    border:1px solid rgba(255,255,255,.12);
+.control-btn{
+    border:none;
 
-    padding:7px 12px;
+    min-width:118px;
+    height:36px;
 
-    border-radius:18px;
+    padding:0 15px;
 
-    color:#fff;
+    border-radius:19px;
 
     background:
         linear-gradient(
-            145deg,
-            #1d2b24,
-            #101814
+            180deg,
+            #d7bd62,
+            #9d812c
         );
 
-    box-shadow:
-        0 5px 12px rgba(0,0,0,.28);
+    color:#fffce9;
 
-    font-size:9px;
-
+    font-size:11px;
     font-weight:800;
+
+    box-shadow:
+        0 5px 13px rgba(0,0,0,.3),
+        inset 0 1px 0 rgba(255,255,255,.3);
 
     cursor:pointer;
 }
 
-.btn.primary{
-    background:
-        linear-gradient(
-            145deg,
-            #d3a747,
-            #8f6525
-        );
-
-    border-color:#ebca76;
+.control-btn:active{
+    transform:translateY(1px);
 }
 
-.btn:active{
-    transform:scale(.96);
+.control-btn.secondary{
+    background:rgba(3,31,24,.85);
+    border:1px solid rgba(214,188,94,.3);
+    color:#ddcc8b;
 }
 
+/* وقتی بازی شروع شده، کنترل رفرش کوچک */
 
-/* =========================================================
-   MODAL
-========================================================= */
+#refreshBtn{
+    min-width:auto;
+    width:42px;
+    padding:0;
+    display:none;
+}
+
+/* ---------------- MODAL ---------------- */
 
 .modal{
     position:fixed;
 
     inset:0;
 
-    z-index:1000;
+    z-index:200;
 
     display:none;
 
     align-items:center;
-
     justify-content:center;
 
     padding:20px;
 
-    background:rgba(0,0,0,.76);
+    background:rgba(0,0,0,.68);
 
-    backdrop-filter:blur(4px);
+    backdrop-filter:blur(5px);
 }
 
 .modal.show{
@@ -1248,249 +834,191 @@ button{
 }
 
 .modal-box{
-    width:min(340px,94vw);
+    width:min(330px,90vw);
 
     padding:22px;
 
-    border-radius:25px;
+    border-radius:24px;
 
     background:
         linear-gradient(
-            145deg,
-            #0b4f34,
-            #0a6d45
+            180deg,
+            #102c24,
+            #071a15
         );
 
-    border:2px solid var(--gold);
+    border:1px solid rgba(214,188,95,.4);
 
     box-shadow:
-        0 18px 45px rgba(0,0,0,.65);
-
-    text-align:center;
+        0 20px 50px rgba(0,0,0,.55);
 }
 
 .modal-title{
-    font-size:19px;
+    text-align:center;
 
-    font-weight:900;
+    font-size:17px;
+    font-weight:800;
 
-    margin-bottom:7px;
-}
+    color:#e5d287;
 
-.modal-subtitle{
-    font-size:11px;
-
-    color:#c7d1cc;
-
-    margin-bottom:16px;
+    margin-bottom:18px;
 }
 
 .suits{
     display:grid;
-
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:1fr 1fr;
 
     gap:9px;
 }
 
 .suit-btn{
-    min-height:64px;
+    height:58px;
 
     border-radius:16px;
 
-    border:1px solid rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.07);
 
-    background:rgba(0,0,0,.2);
+    background:rgba(255,255,255,.045);
 
-    color:#fff;
-
-    font-size:28px;
+    font-size:26px;
 
     cursor:pointer;
 }
 
 .suit-btn.red{
-    color:#ff5555;
+    color:#ed4c52;
 }
 
+.suit-btn.black{
+    color:#eee;
+}
 
-/* =========================================================
-   MESSAGE
-========================================================= */
+/* ---------------- MESSAGE ---------------- */
 
 .message{
     position:fixed;
 
     left:50%;
+    bottom:22px;
 
-    bottom:20px;
+    transform:translate(-50%,20px);
 
-    transform:translateX(-50%);
-
-    z-index:2000;
+    z-index:300;
 
     max-width:90vw;
 
-    padding:10px 16px;
+    padding:10px 17px;
 
-    border-radius:16px;
+    border-radius:20px;
 
-    background:rgba(0,0,0,.88);
+    background:rgba(8,24,20,.96);
 
-    color:#fff;
+    border:1px solid rgba(214,188,95,.3);
+
+    color:#eee9d7;
 
     font-size:11px;
 
-    text-align:center;
+    opacity:0;
 
-    display:none;
+    pointer-events:none;
 
-    box-shadow:
-        0 8px 25px rgba(0,0,0,.35);
+    transition:.2s ease;
 }
 
 .message.show{
-    display:block;
+    opacity:1;
+    transform:translate(-50%,0);
 }
 
-
-/* =========================================================
-   SMALL PHONES
-========================================================= */
+/* ---------------- SMALL SCREENS ---------------- */
 
 @media(max-height:700px){
 
     .game-head{
-        height:68px;
+        height:48px;
+        min-height:48px;
+    }
+
+    .brand h1{
+        font-size:19px;
     }
 
     .score-row{
-        margin-bottom:4px;
+        height:38px;
+        min-height:38px;
+        margin-bottom:5px;
     }
 
     .table{
-        height:calc(100dvh - 235px);
-
-        min-height:430px;
+        border-width:5px;
+        border-radius:29px;
     }
 
     .seat.top{
-        top:21px;
+        top:43px;
     }
 
-    .seat.left,
-    .seat.right{
-        top:42%;
+    .avatar{
+        width:54px;
+        height:54px;
     }
 
-    .center{
-        top:27%;
+    .player-name{
+        margin-top:4px;
+        padding:4px 8px;
+    }
 
-        transform:
-            translateX(-50%)
-            scale(.88);
+    .ahuramehr-title{
+        font-size:26px;
     }
 
     .my-strip{
-        min-height:40px;
-
-        margin-top:4px;
-    }
-
-    .my-avatar{
-        width:38px;
-        height:38px;
-
-        font-size:17px;
-    }
-
-    .my-name{
-        font-size:13px;
-    }
-
-    .hand-wrap{
-        height:105px;
-    }
-
-    .hand{
-        height:102px;
-    }
-
-    .card{
-        height:72px;
+        bottom:101px;
     }
 
     .controls{
-        margin-top:1px;
+        bottom:92px;
     }
 
-    .btn{
-        padding:6px 10px;
+    .hand-wrap{
+        height:83px;
+    }
+
+    .hand{
+        height:83px;
+    }
+
+    .card{
+        height:clamp(58px,17.5vw,74px);
     }
 }
 
-
-/* =========================================================
-   VERY SMALL PHONES
-========================================================= */
-
 @media(max-width:380px){
 
-    .page{
-        padding-left:5px;
-        padding-right:5px;
-    }
-
     .game-head{
-        height:64px;
-
-        grid-template-columns:44px 1fr 44px;
+        height:45px;
+        min-height:45px;
     }
 
-    .icon-btn{
-        width:35px;
-        height:35px;
-
-        font-size:16px;
+    .score-row{
+        grid-template-columns:1fr 58px 1fr;
     }
 
-    .game-title strong{
-        font-size:18px;
-    }
-
-    .game-title span{
-        font-size:9px;
-    }
-
-    .table{
-        height:calc(100dvh - 225px);
-
-        min-height:410px;
-
-        border-width:4px;
-
-        border-radius:34px;
+    .score-box{
+        padding:0 9px;
     }
 
     .table-top{
-        left:10px;
-        right:10px;
+        top:8px;
+        left:9px;
+        right:9px;
     }
 
+    .status-pill,
     .hokm-pill{
-        min-width:80px;
-
+        padding:6px 9px;
         font-size:8px;
-    }
-
-    .turn-pill{
-        max-width:120px;
-
-        font-size:8px;
-    }
-
-    .seat{
-        width:92px;
     }
 
     .seat.left{
@@ -1502,421 +1030,254 @@ button{
     }
 
     .avatar{
-        width:50px;
-        height:50px;
-
-        font-size:21px;
+        width:48px;
+        height:48px;
     }
 
-    .seat-name{
-        font-size:10px;
+    .player-name{
+        max-width:85px;
+        font-size:8px;
     }
 
-    .center{
-        top:27%;
-
-        transform:
-            translateX(-50%)
-            scale(.78);
-    }
-
-    .hand-wrap{
-        height:98px;
-    }
-
-    .hand{
-        height:95px;
-    }
-
-    .card{
-        flex-basis:39px;
-
-        width:39px;
-
-        height:69px;
-
-        margin-left:-12px;
-    }
-
-    .card-center-suit{
-        font-size:26px;
+    .ahuramehr-title{
+        font-size:23px;
     }
 
     .my-strip{
-        margin-left:6px;
-        margin-right:6px;
+        bottom:92px;
+    }
+
+    .controls{
+        bottom:84px;
+    }
+
+    .control-btn{
+        min-width:105px;
+        height:33px;
+        font-size:10px;
+    }
+
+    .hand-wrap{
+        height:76px;
+    }
+
+    .hand{
+        height:76px;
+    }
+
+    .card{
+        flex-basis:34px;
+        width:34px;
+        height:58px;
+        margin-left:-8px;
+    }
+
+    .card-rank{
+        font-size:9px;
+    }
+
+    .card-suit{
+        font-size:19px;
     }
 }
-
 </style>
 </head>
-
 
 <body>
 
 <div class="page">
 
-
-    <!-- =====================================================
-         HEADER
-    ====================================================== -->
-
+    <!-- HEADER -->
     <header class="game-head">
 
-        <div class="head-side">
+        <button class="head-btn" id="menuBtn">•••</button>
 
-            <button
-                class="icon-btn"
-                onclick="tg && tg.close ? tg.close() : null"
-            >
-                ×
-            </button>
-
+        <div class="brand">
+            <h1>حکم گرین‌دریم</h1>
+            <p>میز بازی آنلاین</p>
         </div>
 
-
-        <div class="game-title">
-
-            <strong>حکم</strong>
-
-            <span>
-                میز بازی گرین‌دریم
-            </span>
-
-            <span
-                id="roundInfo"
-                class="round-pill"
-            >
-                دست ۱
-            </span>
-
-        </div>
-
-
-        <div class="head-side">
-
-            <button
-                class="icon-btn"
-                onclick="showMessage('پنل بازی')"
-            >
-                ⋯
-            </button>
-
-        </div>
+        <button class="head-btn" id="closeBtn">×</button>
 
     </header>
 
 
-
-    <!-- =====================================================
-         SCORE
-    ====================================================== -->
-
+    <!-- SCORE -->
     <div class="score-row">
 
         <div class="score-box">
-
-            <span id="teamAName">
-                ما
-            </span>
-
-            <span
-                id="teamAScore"
-                class="score"
-            >
-                ۰
-            </span>
-
+            <span id="team2Name">حریف</span>
+            <strong id="score2">0</strong>
         </div>
-
 
         <div class="score-center">
-            امتیاز
+            <span>امتیاز</span>
         </div>
 
-
         <div class="score-box">
-
-            <span id="teamBName">
-                حریف
-            </span>
-
-            <span
-                id="teamBScore"
-                class="score"
-            >
-                ۰
-            </span>
-
+            <span>ما</span>
+            <strong id="score1">0</strong>
         </div>
 
     </div>
 
 
-
-    <!-- =====================================================
-         TABLE
-    ====================================================== -->
-
+    <!-- TABLE -->
     <section class="table">
 
-
-        <!-- TABLE INFO -->
-
+        <!-- top information -->
         <div class="table-top">
 
-            <div
-                id="hokmInfo"
-                class="hokm-pill"
-            >
-                حکم:
-                <b>—</b>
+            <div class="status-pill" id="turnText">
+                منتظر شروع بازی
             </div>
 
-
-            <div
-                id="turnInfo"
-                class="turn-pill"
-            >
-                در حال دریافت وضعیت...
+            <div class="hokm-pill" id="hokmText">
+                حکم: —
             </div>
 
         </div>
-
 
 
         <!-- TOP PLAYER -->
+        <div id="seatTop" class="seat top">
 
-        <div
-            id="seatTop"
-            class="seat top"
-        >
+            <div class="avatar">•</div>
 
-            <div class="avatar">
-                ♞
+            <div class="player-name">
+                صندلی خالی
             </div>
 
-            <div class="seat-name">
-                —
-            </div>
-
-            <div class="seat-meta">
-                —
+            <div class="player-meta">
+                منتظر بازیکن
             </div>
 
         </div>
-
 
 
         <!-- LEFT PLAYER -->
+        <div id="seatLeft" class="seat left">
 
-        <div
-            id="seatLeft"
-            class="seat left"
-        >
+            <div class="avatar">•</div>
 
-            <div class="avatar">
-                🐱
+            <div class="player-name">
+                صندلی خالی
             </div>
 
-            <div class="seat-name">
-                —
-            </div>
-
-            <div class="seat-meta">
-                —
+            <div class="player-meta">
+                منتظر بازیکن
             </div>
 
         </div>
-
 
 
         <!-- RIGHT PLAYER -->
+        <div id="seatRight" class="seat right">
 
-        <div
-            id="seatRight"
-            class="seat right"
-        >
+            <div class="avatar">•</div>
 
-            <div class="avatar">
-                🐯
+            <div class="player-name">
+                صندلی خالی
             </div>
 
-            <div class="seat-name">
-                —
-            </div>
-
-            <div class="seat-meta">
-                —
+            <div class="player-meta">
+                منتظر بازیکن
             </div>
 
         </div>
 
 
+        <!-- AHORAMEHR -->
+        <div class="ahuramehr">
 
-        <!-- CENTER -->
+            <div class="ahuramehr-title">
+                اهورامهر
+            </div>
 
-        <div class="center">
+            <div class="ahuramehr-line"></div>
 
-            <div class="trick-label">
+            <div class="ahuramehr-sub">
+                حکم گرین‌دریم
+            </div>
+
+        </div>
+
+
+        <!-- PLAYED CARDS -->
+        <div class="center" id="trick">
+
+            <div class="center-label">
                 کارت‌های بازی‌شده
             </div>
 
-
-            <div
-                id="trick"
-                class="trick"
-            ></div>
-
-
-            <div
-                id="hokmBox"
-                class="hokm-center empty"
-            >
-                حکم —
-            </div>
-
         </div>
-
 
 
         <!-- TIMER -->
+        <div class="timer" id="timer">
+            زمان نوبت: ۳۰
+        </div>
 
-        <div
-            id="timer"
-            class="timer"
-        >
 
-            زمان نوبت
+        <!-- MY PLAYER -->
+        <div class="my-strip">
 
-            <b id="timerValue">
-                ۳۰
-            </b>
+            <div class="my-avatar" id="myAvatar">
+                A
+            </div>
+
+            <div class="my-name" id="myName">
+                بازیکن
+            </div>
 
         </div>
 
+
+        <!-- CONTROLS -->
+        <div class="controls" id="controls">
+
+            <button
+                id="startBtn"
+                class="control-btn"
+                onclick="startGame()"
+                style="display:none"
+            >
+                شروع بازی
+            </button>
+
+            <button
+                id="refreshBtn"
+                class="control-btn secondary"
+                onclick="loadGame()"
+                title="به‌روزرسانی"
+            >
+                ↻
+            </button>
+
+        </div>
+
+
+        <!-- HAND -->
+        <div class="hand-wrap">
+
+            <div id="hand" class="hand"></div>
+
+        </div>
 
     </section>
-
-
-
-    <!-- =====================================================
-         MY PLAYER
-    ====================================================== -->
-
-    <div class="my-strip">
-
-
-        <div
-            id="waiting"
-            class="waiting"
-        >
-            منتظر بازیکنان...
-        </div>
-
-
-        <div class="my-player">
-
-            <div>
-
-                <div
-                    id="myName"
-                    class="my-name"
-                >
-                    بازیکن
-                </div>
-
-
-                <div
-                    id="bottomInfo"
-                    style="
-                        color:#9da9a3;
-                        font-size:8px;
-                        margin-top:2px;
-                    "
-                >
-                    دست شما
-                </div>
-
-            </div>
-
-
-            <div
-                id="myAvatar"
-                class="my-avatar"
-            >
-                🦉
-            </div>
-
-        </div>
-
-    </div>
-
-
-
-    <!-- =====================================================
-         HAND
-    ====================================================== -->
-
-    <div class="hand-wrap">
-
-        <div
-            id="hand"
-            class="hand"
-        ></div>
-
-    </div>
-
-
-
-    <!-- =====================================================
-         BUTTONS
-    ====================================================== -->
-
-    <div class="controls">
-
-        <button
-            id="startBtn"
-            class="btn primary"
-            onclick="startGame()"
-        >
-            🎮 شروع بازی
-        </button>
-
-
-        <button
-            class="btn"
-            onclick="loadGame()"
-        >
-            ↻ بروزرسانی
-        </button>
-
-    </div>
-
 
 </div>
 
 
+<!-- HOKM MODAL -->
 
-<!-- =========================================================
-     HOKM MODAL
-========================================================= -->
-
-<div
-    id="hokmModal"
-    class="modal"
->
+<div id="hokmModal" class="modal">
 
     <div class="modal-box">
 
         <div class="modal-title">
-            👑 انتخاب حکم
+            حکم را انتخاب کن
         </div>
-
-        <div class="modal-subtitle">
-            یکی از خال‌ها را برای حکم انتخاب کنید
-        </div>
-
 
         <div class="suits">
 
@@ -1935,14 +1296,14 @@ button{
             </button>
 
             <button
-                class="suit-btn"
+                class="suit-btn black"
                 onclick="chooseHokm('♣')"
             >
                 ♣
             </button>
 
             <button
-                class="suit-btn"
+                class="suit-btn black"
                 onclick="chooseHokm('♠')"
             >
                 ♠
@@ -1955,16 +1316,7 @@ button{
 </div>
 
 
-
-<!-- =========================================================
-     MESSAGE
-========================================================= -->
-
-<div
-    id="message"
-    class="message"
-></div>
-
+<div id="message" class="message"></div>
 
 
 <script>
@@ -1980,11 +1332,12 @@ const tg =
         : null;
 
 if(tg){
-
     tg.ready();
-
     tg.expand();
 
+    try{
+        tg.disableVerticalSwipes();
+    }catch(e){}
 }
 
 
@@ -1992,10 +1345,7 @@ if(tg){
    GAME
 ========================================================= */
 
-const params =
-    new URLSearchParams(
-        window.location.search
-    );
+const params = new URLSearchParams(window.location.search);
 
 const gameId =
     params.get("game") ||
@@ -2007,46 +1357,34 @@ let messageTimer = null;
 
 
 /* =========================================================
-   HEADERS
+   API
 ========================================================= */
 
 function headers(){
 
-    const result = {
-        "Content-Type":
-            "application/json"
+    const h = {
+        "Content-Type":"application/json"
     };
 
     if(
         tg &&
         tg.initData
     ){
-
-        result[
-            "X-Telegram-Init-Data"
-        ] = tg.initData;
-
+        h["X-Telegram-Init-Data"] =
+            tg.initData;
     }
 
-    return result;
+    return h;
 }
 
 
-/* =========================================================
-   API
-========================================================= */
-
-async function api(
-    url,
-    options={}
-){
+async function api(url, options={}){
 
     const response =
         await fetch(
             url,
             {
                 ...options,
-
                 headers:{
                     ...headers(),
                     ...(options.headers || {})
@@ -2054,30 +1392,23 @@ async function api(
             }
         );
 
-
-    let data={};
+    let data = null;
 
     try{
-
-        data =
-            await response.json();
-
-    }catch{
-
-        data={};
-
+        data = await response.json();
+    }catch(e){
+        data = {};
     }
-
 
     if(!response.ok){
 
         throw new Error(
+            data.detail ||
             data.error ||
+            data.message ||
             "خطا در ارتباط با سرور"
         );
-
     }
-
 
     return data;
 }
@@ -2089,136 +1420,109 @@ async function api(
 
 function showMessage(text){
 
-    const box =
-        document.getElementById(
-            "message"
-        );
+    const el =
+        document.getElementById("message");
 
-    box.textContent = text;
+    el.textContent = text;
 
-    box.classList.add("show");
+    el.classList.add("show");
 
-    clearTimeout(
-        messageTimer
-    );
+    clearTimeout(messageTimer);
 
     messageTimer =
         setTimeout(
-            () =>
-                box.classList.remove(
-                    "show"
-                ),
+            ()=>{
+                el.classList.remove("show");
+            },
             2600
         );
-
 }
 
 
 /* =========================================================
-   ESCAPE HTML
+   HELPERS
 ========================================================= */
 
 function escapeHtml(value){
 
-    return String(
-        value ?? ""
-    )
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-
+    return String(value ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
 }
 
 
-/* =========================================================
-   CARD HELPERS
-========================================================= */
-
 function cardIsRed(suit){
 
-    return (
-        suit === "♥" ||
-        suit === "♦"
-    );
-
+    return suit === "♥" ||
+           suit === "♦";
 }
 
 
 function initials(name){
 
-    const s =
-        String(
-            name || "؟"
-        ).trim();
+    const text =
+        String(name || "A").trim();
 
-    return s
-        ? s.slice(0,1).toUpperCase()
-        : "؟";
+    if(!text){
+        return "A";
+    }
 
+    return text
+        .split(/\s+/)
+        .slice(0,2)
+        .map(x => x[0])
+        .join("")
+        .toUpperCase();
+}
+
+
+function getPlayers(state){
+
+    return (
+        state.players ||
+        state.game?.players ||
+        []
+    );
+}
+
+
+function getMe(state){
+
+    return (
+        state.me ||
+        state.viewer ||
+        state.current_user ||
+        null
+    );
 }
 
 
 /* =========================================================
-   SCORE UI
+   SCORE
 ========================================================= */
 
 function setScoreUI(state){
 
-    const a =
-        state.team_a_score ??
-        state.score_a ??
-        state.our_score ??
+    const score1 =
+        state.score_us ??
+        state.team1_score ??
+        state.score1 ??
         0;
 
-    const b =
-        state.team_b_score ??
-        state.score_b ??
-        state.opponent_score ??
+    const score2 =
+        state.score_them ??
+        state.team2_score ??
+        state.score2 ??
         0;
 
+    document.getElementById("score1")
+        .textContent = score1;
 
-    document.getElementById(
-        "teamAScore"
-    ).textContent = a;
-
-
-    document.getElementById(
-        "teamBScore"
-    ).textContent = b;
-
-
-    if(state.team_a_name){
-
-        document.getElementById(
-            "teamAName"
-        ).textContent =
-            state.team_a_name;
-
-    }
-
-
-    if(state.team_b_name){
-
-        document.getElementById(
-            "teamBName"
-        ).textContent =
-            state.team_b_name;
-
-    }
-
-
-    if(state.round != null){
-
-        document.getElementById(
-            "roundInfo"
-        ).textContent =
-            "دست " +
-            state.round;
-
-    }
-
+    document.getElementById("score2")
+        .textContent = score2;
 }
 
 
@@ -2230,38 +1534,33 @@ async function loadGame(){
 
     if(!gameId){
 
-        document.getElementById(
-            "turnInfo"
-        ).textContent =
-            "❌ شناسه بازی پیدا نشد";
+        showMessage(
+            "شناسه بازی پیدا نشد"
+        );
 
         return;
-
     }
-
 
     try{
 
         const state =
             await api(
-                `/api/game/${gameId}`
+                `/api/game/${encodeURIComponent(gameId)}`
             );
 
         currentState = state;
 
         render(state);
 
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            error.message ||
+            "خطا در دریافت بازی"
+        );
     }
-    catch(error){
-
-        document.getElementById(
-            "turnInfo"
-        ).textContent =
-            "❌ " +
-            error.message;
-
-    }
-
 }
 
 
@@ -2271,64 +1570,11 @@ async function loadGame(){
 
 function render(state){
 
+    if(!state){
+        return;
+    }
+
     setScoreUI(state);
-
-
-    document.getElementById(
-        "turnInfo"
-    ).textContent =
-
-        state.current_player_name
-
-            ? "🎯 نوبت: " +
-              state.current_player_name
-
-            : (
-                state.status_text ||
-                "در حال بازی"
-            );
-
-
-    const hokm =
-        state.hokm || "—";
-
-
-    document.getElementById(
-        "hokmInfo"
-    ).innerHTML =
-        `حکم: <b>${
-            escapeHtml(hokm)
-        }</b>`;
-
-
-    const hokmBox =
-        document.getElementById(
-            "hokmBox"
-        );
-
-
-    if(state.hokm){
-
-        hokmBox.textContent =
-            "حکم " +
-            state.hokm;
-
-        hokmBox.classList.remove(
-            "empty"
-        );
-
-    }
-    else{
-
-        hokmBox.textContent =
-            "حکم —";
-
-        hokmBox.classList.add(
-            "empty"
-        );
-
-    }
-
 
     renderSeats(state);
 
@@ -2337,178 +1583,214 @@ function render(state){
     renderHand(state);
 
 
-    const startBtn =
-        document.getElementById(
-            "startBtn"
+    /* حکم */
+
+    const hokm =
+        state.hokm ||
+        state.trump ||
+        null;
+
+    document.getElementById("hokmText")
+        .textContent =
+            `حکم: ${hokm || "—"}`;
+
+
+    /* نوبت */
+
+    const turnEl =
+        document.getElementById("turnText");
+
+    const phase =
+        state.phase ||
+        "waiting";
+
+    if(phase === "waiting"){
+
+        turnEl.textContent =
+            "منتظر شروع بازی";
+
+    }else if(
+        phase === "choose_hokm"
+    ){
+
+        turnEl.textContent =
+            "انتخاب حکم";
+
+    }else if(
+        phase === "playing"
+    ){
+
+        const me =
+            getMe(state);
+
+        const currentId =
+            state.current_player_id ||
+            state.turn_player_id ||
+            state.current_player;
+
+        if(
+            me &&
+            String(currentId) ===
+            String(me.id)
+        ){
+
+            turnEl.textContent =
+                "نوبت شما";
+
+        }else{
+
+            turnEl.textContent =
+                "نوبت بازیکن مقابل";
+        }
+
+    }else{
+
+        turnEl.textContent =
+            phase;
+    }
+
+
+    /* نام بازیکن خودمان */
+
+    const me =
+        getMe(state);
+
+    if(me){
+
+        document.getElementById("myName")
+            .textContent =
+                me.name ||
+                me.username ||
+                "بازیکن";
+
+        document.getElementById("myAvatar")
+            .textContent =
+                initials(
+                    me.name ||
+                    me.username
+                );
+    }
+
+
+    /* دکمه شروع */
+
+    updateStartButton(state);
+
+
+    /* مودال حکم */
+
+    const modal =
+        document.getElementById("hokmModal");
+
+    const isHakim =
+        Boolean(
+            state.is_hakim ||
+            state.viewer_is_hakim ||
+            me?.is_hakim ||
+            (
+                state.hakim_id &&
+                me &&
+                String(state.hakim_id) ===
+                String(me.id)
+            )
         );
 
+    if(
+        phase === "choose_hokm" &&
+        isHakim
+    ){
 
-    if(state.started){
+        modal.classList.add("show");
 
-        startBtn.style.display =
-            "none";
+    }else{
 
+        modal.classList.remove("show");
     }
-    else{
-
-        startBtn.style.display =
-
-            Number(
-                state.viewer_id
-            ) === Number(
-                state.creator_id
-            )
-
-                ? "inline-block"
-
-                : "none";
-
-    }
-
-
-    document
-        .getElementById(
-            "hokmModal"
-        )
-        .classList.toggle(
-
-            "show",
-
-            state.phase ===
-                "choose_hokm"
-
-            &&
-
-            Number(
-                state.viewer_id
-            ) === Number(
-                state.hakim_id
-            )
-
-        );
-
 }
 
 
 /* =========================================================
-   SEAT
+   START BUTTON
 ========================================================= */
 
-function updateSeat(
-    seat,
-    player
-){
+function updateStartButton(state){
 
-    seat.classList.remove(
-        "turn",
-        "empty-seat"
-    );
+    const btn =
+        document.getElementById("startBtn");
 
+    const refresh =
+        document.getElementById("refreshBtn");
 
-    const avatar =
-        seat.querySelector(
-            ".avatar"
+    const phase =
+        state.phase ||
+        "waiting";
+
+    const me =
+        getMe(state);
+
+    /*
+      چند روش مختلف برای تشخیص سازنده
+      پشتیبانی شده تا با نسخه فعلی بک‌اند
+      مشکل نداشته باشد.
+    */
+
+    const creatorId =
+        state.creator_id ??
+        state.owner_id ??
+        state.host_id ??
+        state.creator?.id ??
+        state.game?.creator_id ??
+        state.game?.owner_id;
+
+    const amCreator =
+        Boolean(
+            state.is_creator ||
+            state.viewer_is_creator ||
+            me?.is_creator ||
+            (
+                creatorId &&
+                me &&
+                String(creatorId) ===
+                String(me.id)
+            )
         );
 
-    const name =
-        seat.querySelector(
-            ".seat-name"
+
+    /*
+      اگر API خودش اجازه شروع را اعلام کرده
+      باشد، آن را هم قبول می‌کنیم.
+    */
+
+    const canStart =
+        Boolean(
+            state.can_start ||
+            state.can_start_game ||
+            state.viewer_can_start
         );
 
-    const meta =
-        seat.querySelector(
-            ".seat-meta"
-        );
 
-
-    seat
-        .querySelector(
-            ".crown"
+    if(
+        phase === "waiting" &&
+        (
+            amCreator ||
+            canStart
         )
-        ?.remove();
+    ){
 
+        btn.style.display =
+            "block";
 
-    if(!player){
+        refresh.style.display =
+            "none";
 
-        seat.classList.add(
-            "empty-seat"
-        );
+    }else{
 
-        avatar.textContent =
-            "•";
+        btn.style.display =
+            "none";
 
-        name.textContent =
-            "صندلی خالی";
-
-        meta.textContent =
-            "";
-
-        return;
-
+        refresh.style.display =
+            "block";
     }
-
-
-    avatar.textContent =
-        player.avatar ||
-        initials(
-            player.name
-        );
-
-
-    name.textContent =
-        player.name ||
-        "بازیکن";
-
-
-    let metaText=[];
-
-
-    if(player.is_turn){
-
-        seat.classList.add(
-            "turn"
-        );
-
-        metaText.push(
-            "🎯 نوبت"
-        );
-
-    }
-
-
-    if(player.is_bot){
-
-        metaText.push(
-            "🤖 کامپیوتر"
-        );
-
-    }
-
-
-    meta.textContent =
-        metaText.join(" • ") ||
-        "در بازی";
-
-
-    if(player.is_hakim){
-
-        const crown =
-            document.createElement(
-                "div"
-            );
-
-        crown.className =
-            "crown";
-
-        crown.textContent =
-            "👑 حاکم";
-
-        seat.appendChild(
-            crown
-        );
-
-    }
-
 }
 
 
@@ -2516,114 +1798,143 @@ function updateSeat(
    SEATS
 ========================================================= */
 
+function updateSeat(seatId, player){
+
+    const seat =
+        document.getElementById(seatId);
+
+    if(!seat){
+        return;
+    }
+
+    const avatar =
+        seat.querySelector(".avatar");
+
+    const name =
+        seat.querySelector(".player-name");
+
+    const meta =
+        seat.querySelector(".player-meta");
+
+
+    if(!player){
+
+        avatar.textContent = "•";
+
+        name.textContent =
+            "صندلی خالی";
+
+        meta.textContent =
+            "منتظر بازیکن";
+
+        return;
+    }
+
+
+    const playerName =
+        player.name ||
+        player.username ||
+        player.first_name ||
+        "بازیکن";
+
+
+    avatar.textContent =
+        initials(playerName);
+
+
+    name.innerHTML =
+        escapeHtml(playerName) +
+        (
+            player.is_hakim
+                ? " 👑"
+                : ""
+        );
+
+
+    if(player.is_hakim){
+
+        meta.textContent =
+            "حاکم";
+
+    }else if(
+        player.is_current ||
+        player.is_turn
+    ){
+
+        meta.textContent =
+            "نوبت";
+
+    }else{
+
+        meta.textContent =
+            "بازیکن";
+    }
+}
+
+
 function renderSeats(state){
 
     const players =
-        state.players || [];
-
+        getPlayers(state);
 
     const me =
-        players.find(
-            p =>
-                Number(p.id) ===
-                Number(
-                    state.viewer_id
-                )
-        );
+        getMe(state);
 
 
-    const others =
+    /*
+      اول بازیکن خودمان را پیدا می‌کنیم.
+    */
+
+    let others =
         players.filter(
             p =>
-                Number(p.id) !==
-                Number(
-                    state.viewer_id
-                )
+                !me ||
+                String(p.id) !==
+                String(me.id)
+        );
+
+
+    /*
+      اگر بک‌اند صندلی را مشخص کرده
+      باشد همان را استفاده می‌کنیم.
+    */
+
+    const top =
+        players.find(
+            p =>
+                p.seat === "top" ||
+                p.position === "top"
+        );
+
+    const left =
+        players.find(
+            p =>
+                p.seat === "left" ||
+                p.position === "left"
+        );
+
+    const right =
+        players.find(
+            p =>
+                p.seat === "right" ||
+                p.position === "right"
         );
 
 
     updateSeat(
-        document.getElementById(
-            "seatTop"
-        ),
-        others[0]
+        "seatTop",
+        top || others[0] || null
     );
-
 
     updateSeat(
-        document.getElementById(
-            "seatRight"
-        ),
-        others[1]
+        "seatLeft",
+        left || others[1] || null
     );
-
 
     updateSeat(
-        document.getElementById(
-            "seatLeft"
-        ),
-        others[2]
+        "seatRight",
+        right || others[2] || null
     );
-
-
-    if(me){
-
-        document.getElementById(
-            "myName"
-        ).textContent =
-            me.name ||
-            "بازیکن";
-
-
-        document.getElementById(
-            "myAvatar"
-        ).textContent =
-            me.avatar ||
-            initials(me.name);
-
-
-        let info =
-            state.status_text ||
-            "دست شما";
-
-
-        if(me.is_turn){
-
-            info =
-                "🎯 نوبت شما";
-
-        }
-
-
-        if(me.is_hakim){
-
-            info +=
-                " • 👑 حاکم";
-
-        }
-
-
-        document.getElementById(
-            "bottomInfo"
-        ).textContent =
-            info;
-
-
-        document.getElementById(
-            "waiting"
-        ).textContent =
-
-            me.is_turn
-
-                ? "نوبت شماست"
-
-                : (
-                    state.status_text ||
-                    "منتظر نوبت..."
-                );
-
-    }
-
 }
 
 
@@ -2634,74 +1945,50 @@ function renderSeats(state){
 function renderTrick(state){
 
     const trick =
-        document.getElementById(
-            "trick"
-        );
+        document.getElementById("trick");
 
-
-    trick.innerHTML = "";
+    trick.innerHTML =
+        `<div class="center-label">
+            کارت‌های بازی‌شده
+        </div>`;
 
 
     const cards =
-        state.current_trick || [];
+        state.current_trick ||
+        state.trick ||
+        [];
 
 
     cards.forEach(
-        (item,index) => {
+        (item,index)=>{
+
+            const suit =
+                item.suit ||
+                "";
+
+            const rank =
+                item.rank ||
+                "";
 
             const card =
-                item.card;
+                document.createElement("div");
 
-
-            if(!card)
-                return;
-
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-
-            div.className =
+            card.className =
                 "played " +
-
                 (
-                    cardIsRed(
-                        card.suit
-                    )
-                        ? "red "
+                    cardIsRed(suit)
+                        ? "red"
                         : ""
                 ) +
-
-                "p" +
-
+                " p" +
                 (index + 1);
 
+            card.textContent =
+                `${rank}${suit}`;
 
-            div.innerHTML =
-                `
-                <div class="rank">
-                    ${escapeHtml(
-                        card.label
-                    )}
-                </div>
-
-                <div class="suit">
-                    ${escapeHtml(
-                        card.suit
-                    )}
-                </div>
-                `;
-
-
-            trick.appendChild(
-                div
-            );
-
+            trick.appendChild(card);
         }
     );
-
 }
 
 
@@ -2712,287 +1999,328 @@ function renderTrick(state){
 function renderHand(state){
 
     const hand =
-        document.getElementById(
-            "hand"
-        );
-
+        document.getElementById("hand");
 
     hand.innerHTML = "";
 
 
     const me =
-        (state.players || [])
-        .find(
-            p =>
-                Number(p.id) ===
-                Number(
-                    state.viewer_id
-                )
-        );
+        getMe(state);
 
 
-    if(!me)
-        return;
+    let mePlayer =
+        me;
 
 
-    const cards =
-        me.cards || [];
+    const players =
+        getPlayers(state);
 
 
-    const canPlay =
+    if(
+        !mePlayer &&
+        state.viewer_player_id
+    ){
 
-        state.phase ===
-            "playing"
-
-        &&
-
-        Number(
-            state.current_player_id
-        ) === Number(
-            state.viewer_id
-        );
-
-
-    let legal=[];
-
-
-    if(canPlay){
-
-        const trick =
-            state.current_trick ||
-            [];
-
-
-        const lead =
-            state.lead_suit;
-
-
-        if(
-            trick.length === 0 ||
-            !lead
-        ){
-
-            legal = cards;
-
-        }
-        else{
-
-            const sameSuit =
-                cards.filter(
-                    card =>
-                        card.suit ===
-                        lead
-                );
-
-
-            legal =
-                sameSuit.length
-                    ? sameSuit
-                    : cards;
-
-        }
-
+        mePlayer =
+            players.find(
+                p =>
+                    String(p.id) ===
+                    String(state.viewer_player_id)
+            );
     }
 
 
+    if(
+        !mePlayer &&
+        state.user_player_id
+    ){
+
+        mePlayer =
+            players.find(
+                p =>
+                    String(p.id) ===
+                    String(state.user_player_id)
+            );
+    }
+
+
+    if(!mePlayer){
+
+        /*
+          بعضی نسخه‌های API مستقیماً
+          hand را در state می‌دهند.
+        */
+
+        mePlayer = {
+            cards:
+                state.hand ||
+                state.cards ||
+                []
+        };
+    }
+
+
+    const cards =
+        mePlayer.cards ||
+        mePlayer.hand ||
+        [];
+
+
+    const phase =
+        state.phase ||
+        "waiting";
+
+
+    const currentPlayerId =
+        state.current_player_id ||
+        state.turn_player_id ||
+        state.current_player;
+
+
+    const myId =
+        mePlayer.id;
+
+
+    const myTurn =
+        phase === "playing" &&
+        (
+            !currentPlayerId ||
+            !myId ||
+            String(currentPlayerId) ===
+            String(myId)
+        );
+
+
+    /*
+      کارت خال لید برای قانون پیروی از خال
+    */
+
+    const trick =
+        state.current_trick ||
+        state.trick ||
+        [];
+
+
+    const leadSuit =
+        trick.length
+            ? trick[0]?.suit
+            : null;
+
+
+    const hasLeadSuit =
+        leadSuit
+            ? cards.some(
+                c =>
+                    c.suit === leadSuit
+            )
+            : false;
+
+
     cards.forEach(
-        card => {
-
-            const div =
-                document.createElement(
-                    "div"
-                );
-
-
-            const legalCard =
-                legal.some(
-                    item =>
-                        item.suit ===
-                            card.suit
-
-                        &&
-
-                        Number(
-                            item.rank
-                        ) === Number(
-                            card.rank
-                        )
-                );
-
-
-            div.className =
-
-                "card " +
-
-                (
-                    cardIsRed(
-                        card.suit
-                    )
-                        ? "red "
-                        : ""
-                ) +
-
-                (
-                    canPlay &&
-                    !legalCard
-                        ? "disabled"
-                        : ""
-                );
-
-
-            const rank =
-                escapeHtml(
-                    card.label
-                );
-
+        (card)=>{
 
             const suit =
-                escapeHtml(
-                    card.suit
-                );
+                card.suit;
+
+            const rank =
+                card.rank;
 
 
-            div.innerHTML =
-                `
-                <div class="card-corner top">
-
-                    <span class="rank">
-                        ${rank}
-                    </span>
-
-                    <span class="mini-suit">
-                        ${suit}
-                    </span>
-
-                </div>
-
-
-                <div class="card-center-suit">
-                    ${suit}
-                </div>
-
-
-                <div class="card-corner bottom">
-
-                    <span class="rank">
-                        ${rank}
-                    </span>
-
-                    <span class="mini-suit">
-                        ${suit}
-                    </span>
-
-                </div>
-                `;
+            let legal =
+                myTurn;
 
 
             if(
-                canPlay &&
-                legalCard
+                legal &&
+                leadSuit &&
+                hasLeadSuit &&
+                suit !== leadSuit
             ){
 
-                div.onclick =
-                    () =>
-                        playCard(
-                            card.suit,
-                            card.rank,
-                            div
-                        );
-
+                legal = false;
             }
 
 
-            hand.appendChild(
-                div
-            );
+            const el =
+                document.createElement("div");
 
+            el.className =
+                "card " +
+                (
+                    cardIsRed(suit)
+                        ? "red"
+                        : ""
+                ) +
+                (
+                    legal
+                        ? ""
+                        : " disabled"
+                );
+
+
+            el.innerHTML = `
+                <div class="card-rank">
+                    ${escapeHtml(rank)}
+                </div>
+
+                <div class="card-suit">
+                    ${escapeHtml(suit)}
+                </div>
+
+                <div class="card-bottom">
+                    ${escapeHtml(rank)}
+                </div>
+            `;
+
+
+            if(legal){
+
+                el.addEventListener(
+                    "click",
+                    ()=>{
+                        playCard(
+                            suit,
+                            rank,
+                            el
+                        );
+                    }
+                );
+            }
+
+
+            hand.appendChild(el);
         }
     );
-
 }
 
 
 /* =========================================================
-   START
+   START GAME
 ========================================================= */
 
 async function startGame(){
 
-    if(!gameId)
+    if(!gameId){
+
+        showMessage(
+            "شناسه بازی پیدا نشد"
+        );
+
         return;
+    }
+
+
+    const btn =
+        document.getElementById("startBtn");
+
+    btn.disabled = true;
+
+    btn.textContent =
+        "در حال شروع...";
 
 
     try{
 
-        await api(
-            `/api/game/${gameId}/start`,
-            {
-                method:"POST"
-            }
-        );
+        const result =
+            await api(
+                `/api/game/${encodeURIComponent(gameId)}/start`,
+                {
+                    method:"POST"
+                }
+            );
+
+
+        /*
+          اگر API مستقیماً state جدید
+          برگرداند، همان را نمایش می‌دهیم.
+        */
+
+        if(result && (
+            result.phase ||
+            result.players ||
+            result.game
+        )){
+
+            currentState =
+                result;
+
+            render(result);
+        }
 
 
         await loadGame();
 
-    }
-    catch(error){
 
         showMessage(
-            error.message
+            "بازی شروع شد"
         );
 
-    }
 
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            error.message ||
+            "شروع بازی انجام نشد"
+        );
+
+
+        btn.disabled = false;
+
+        btn.textContent =
+            "شروع بازی";
+    }
 }
 
 
 /* =========================================================
-   HOKM
+   CHOOSE HOKM
 ========================================================= */
 
-async function chooseHokm(
-    suit
-){
+async function chooseHokm(suit){
 
-    if(!gameId)
+    if(!gameId){
         return;
+    }
 
 
     try{
 
-        document
-            .getElementById(
-                "hokmModal"
-            )
-            .classList.remove(
-                "show"
-            );
-
-
         await api(
-            `/api/game/${gameId}/hokm`,
+            `/api/game/${encodeURIComponent(gameId)}/hokm`,
             {
                 method:"POST",
 
-                body:
-                    JSON.stringify({
-                        suit
-                    })
+                body:JSON.stringify({
+                    suit:suit
+                })
             }
         );
 
 
+        document
+            .getElementById("hokmModal")
+            .classList.remove("show");
+
+
         await loadGame();
 
-    }
-    catch(error){
 
         showMessage(
-            error.message
+            `حکم ${suit} انتخاب شد`
         );
 
-    }
 
+    }catch(error){
+
+        console.error(error);
+
+        showMessage(
+            error.message ||
+            "انتخاب حکم انجام نشد"
+        );
+    }
 }
 
 
@@ -3009,65 +2337,71 @@ async function playCard(
     if(
         !currentState ||
         currentState.phase !==
-            "playing"
-    )
-        return;
-
-
-    if(
-        Number(
-            currentState.current_player_id
-        ) !== Number(
-            currentState.viewer_id
-        )
+        "playing"
     ){
-
-        showMessage(
-            "الان نوبت شما نیست."
-        );
-
         return;
-
     }
 
 
-    element.classList.add(
-        "selected"
-    );
+    element.style.pointerEvents =
+        "none";
+
+    element.style.transform =
+        "translateY(-14px)";
 
 
     try{
 
         await api(
-            `/api/game/${gameId}/play`,
+            `/api/game/${encodeURIComponent(gameId)}/play`,
             {
                 method:"POST",
 
-                body:
-                    JSON.stringify({
-                        suit,
-                        rank
-                    })
+                body:JSON.stringify({
+                    suit:suit,
+                    rank:rank
+                })
             }
         );
 
 
         await loadGame();
 
-    }
-    catch(error){
 
-        element.classList.remove(
-            "selected"
-        );
+    }catch(error){
+
+        console.error(error);
+
+        element.style.pointerEvents =
+            "auto";
+
+        element.style.transform =
+            "";
 
         showMessage(
-            error.message
+            error.message ||
+            "بازی کارت انجام نشد"
         );
-
     }
-
 }
+
+
+/* =========================================================
+   CLOSE TELEGRAM
+========================================================= */
+
+document
+    .getElementById("closeBtn")
+    .addEventListener(
+        "click",
+        ()=>{
+            if(tg){
+                try{
+                    tg.close();
+                }catch(e){}
+            }
+        }
+    );
 
 
 /* =========================================================
@@ -3077,9 +2411,10 @@ async function playCard(
 loadGame();
 
 
-/*
-   بروزرسانی بازی
-*/
+/* =========================================================
+   AUTO REFRESH
+========================================================= */
+
 setInterval(
     loadGame,
     1800
