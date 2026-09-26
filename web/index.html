@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>حکم گرین‌دریم</title>
+
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <style>
@@ -42,7 +43,10 @@ button{
     --red:#e33b3b;
 }
 
-/* ---------- PAGE ---------- */
+
+/* =========================================================
+   PAGE
+========================================================= */
 
 .page{
     width:100%;
@@ -60,7 +64,10 @@ button{
         linear-gradient(#0c1411,#07100d 75%);
 }
 
-/* ---------- GAME HUD ---------- */
+
+/* =========================================================
+   GAME HEADER
+========================================================= */
 
 .game-head{
     height:92px;
@@ -68,6 +75,7 @@ button{
 
     display:grid;
     grid-template-columns:58px 1fr 58px;
+
     align-items:center;
     gap:5px;
 }
@@ -80,11 +88,16 @@ button{
 .icon-btn{
     width:43px;
     height:43px;
+
     border-radius:50%;
     border:1px solid rgba(226,191,103,.5);
 
     background:
-        linear-gradient(145deg,#1c2822,#0d1512);
+        linear-gradient(
+            145deg,
+            #1c2822,
+            #0d1512
+        );
 
     color:#d9c07d;
 
@@ -103,22 +116,28 @@ button{
 
 .game-title strong{
     display:block;
+
     font-size:23px;
     font-weight:900;
+
     letter-spacing:-.5px;
 }
 
 .game-title span{
     display:block;
+
     margin-top:5px;
+
     color:#c5cbc8;
     font-size:12px;
 }
 
 .round-pill{
     display:inline-flex;
+
     margin-top:7px;
     padding:4px 12px;
+
     border-radius:14px;
 
     background:#111a16;
@@ -128,31 +147,45 @@ button{
     font-size:10px;
 }
 
-/* ---------- SCORE HUD ---------- */
+
+/* =========================================================
+   SCORE
+========================================================= */
 
 .score-row{
     display:grid;
     grid-template-columns:1fr auto 1fr;
+
     align-items:center;
+
     gap:8px;
+
     margin:0 7px 8px;
 }
 
 .score-box{
     min-height:43px;
+
     padding:6px 10px;
+
     border-radius:15px;
 
     background:
-        linear-gradient(145deg,#19231f,#101713);
+        linear-gradient(
+            145deg,
+            #19231f,
+            #101713
+        );
 
     border:1px solid rgba(255,255,255,.07);
 
-    box-shadow:0 5px 14px rgba(0,0,0,.2);
+    box-shadow:
+        0 5px 14px rgba(0,0,0,.2);
 
     display:flex;
     align-items:center;
     justify-content:space-between;
+
     gap:8px;
 
     font-size:11px;
@@ -160,6 +193,7 @@ button{
 
 .score-box .score{
     color:var(--gold2);
+
     font-size:17px;
     font-weight:900;
 }
@@ -167,6 +201,7 @@ button{
 .score-center{
     width:50px;
     height:30px;
+
     border-radius:15px;
 
     display:flex;
@@ -174,6 +209,7 @@ button{
     justify-content:center;
 
     background:#1d2822;
+
     color:#d5ddd9;
 
     border:1px solid rgba(255,255,255,.07);
@@ -181,14 +217,19 @@ button{
     font-size:10px;
 }
 
-/* ---------- TABLE ---------- */
+
+/* =========================================================
+   TABLE
+========================================================= */
 
 .table{
     position:relative;
+
     width:100%;
     height:760px;
 
     border-radius:44px;
+
     border:6px solid var(--gold);
 
     background:
@@ -212,10 +253,12 @@ button{
 
 .table:before{
     content:"";
+
     position:absolute;
     inset:12px;
 
     border-radius:34px;
+
     border:1px solid rgba(245,211,123,.16);
 
     box-shadow:
@@ -226,6 +269,7 @@ button{
 
 .table:after{
     content:"";
+
     position:absolute;
     inset:0;
 
@@ -242,66 +286,88 @@ button{
         );
 
     opacity:.55;
+
     pointer-events:none;
 }
 
-/* ---------- TABLE TOP ---------- */
+
+/* =========================================================
+   TABLE TOP
+========================================================= */
 
 .table-top{
     position:absolute;
+
     top:13px;
     left:18px;
     right:18px;
 
-    z-index:10;
+    z-index:40;
 
     display:flex;
+
     justify-content:space-between;
     align-items:flex-start;
 }
 
 .hokm-pill{
     min-width:104px;
+
     padding:7px 12px;
+
     border-radius:20px;
 
     background:rgba(12,28,22,.8);
+
     border:1px solid rgba(255,255,255,.08);
 
     box-shadow:0 4px 12px rgba(0,0,0,.18);
 
     color:#ead79f;
+
     font-size:11px;
     text-align:center;
 }
 
 .hokm-pill b{
     color:#fff;
+
     font-size:18px;
+
     margin-left:4px;
 }
 
 .turn-pill{
     max-width:170px;
+
     padding:7px 12px;
+
     border-radius:20px;
 
     background:rgba(12,28,22,.8);
+
     border:1px solid rgba(255,255,255,.08);
 
     color:#e9eeeb;
+
     font-size:10px;
 
     white-space:nowrap;
+
     overflow:hidden;
+
     text-overflow:ellipsis;
 }
 
-/* ---------- SEATS ---------- */
+
+/* =========================================================
+   SEATS
+========================================================= */
 
 .seat{
     position:absolute;
-    z-index:12;
+
+    z-index:35;
 
     display:flex;
     flex-direction:column;
@@ -315,6 +381,7 @@ button{
 .seat.top{
     top:30px;
     left:50%;
+
     transform:translateX(-50%);
 }
 
@@ -337,6 +404,7 @@ button{
 
     width:66px;
     height:66px;
+
     border-radius:50%;
 
     display:flex;
@@ -357,6 +425,7 @@ button{
         0 6px 16px rgba(0,0,0,.28);
 
     color:#fff;
+
     font-size:27px;
     font-weight:900;
 }
@@ -374,11 +443,14 @@ button{
 
 .seat-name{
     max-width:112px;
+
     margin-top:7px;
     padding:5px 13px;
+
     border-radius:16px;
 
     background:rgba(10,25,19,.88);
+
     border:1px solid rgba(255,255,255,.06);
 
     box-shadow:0 4px 10px rgba(0,0,0,.18);
@@ -388,6 +460,7 @@ button{
     font-family:Georgia,serif;
     font-style:italic;
     font-weight:700;
+
     font-size:13px;
 
     white-space:nowrap;
@@ -397,12 +470,15 @@ button{
 
 .seat-meta{
     margin-top:5px;
+
     padding:4px 9px;
+
     border-radius:13px;
 
     background:rgba(8,20,15,.72);
 
     color:#b8c1bc;
+
     font-size:9px;
 
     min-height:20px;
@@ -410,15 +486,22 @@ button{
 
 .crown{
     position:absolute;
+
     top:-15px;
     right:-11px;
 
     min-width:54px;
+
     padding:4px 8px;
+
     border-radius:13px;
 
     background:
-        linear-gradient(145deg,#f1ca65,#b17c24);
+        linear-gradient(
+            145deg,
+            #f1ca65,
+            #b17c24
+        );
 
     color:#251a08;
 
@@ -434,11 +517,15 @@ button{
     opacity:.45;
 }
 
-/* ---------- CENTER ---------- */
+
+/* =========================================================
+   CENTER
+========================================================= */
 
 .center{
     position:absolute;
-    z-index:7;
+
+    z-index:20;
 
     top:195px;
     left:50%;
@@ -451,8 +538,11 @@ button{
 
 .trick-label{
     text-align:center;
+
     color:rgba(255,255,255,.45);
+
     font-size:9px;
+
     margin-bottom:5px;
 }
 
@@ -541,14 +631,21 @@ button{
 
 .hokm-center{
     width:84px;
+
     margin:5px auto 0;
+
     padding:7px 10px;
+
     border-radius:20px;
 
     text-align:center;
 
     background:
-        linear-gradient(145deg,#d7aa48,#976b24);
+        linear-gradient(
+            145deg,
+            #d7aa48,
+            #976b24
+        );
 
     border:1px solid #f0cf78;
 
@@ -556,6 +653,7 @@ button{
         0 5px 14px rgba(0,0,0,.35);
 
     color:#fff;
+
     font-size:11px;
     font-weight:900;
 }
@@ -564,38 +662,347 @@ button{
     opacity:.6;
 }
 
-/* ---------- TIMER ---------- */
+
+/* =========================================================
+   TIMER
+   بالای کارت‌ها قرار می‌گیرد تا با کارت‌ها تداخل نداشته باشد
+========================================================= */
 
 .timer{
     position:absolute;
 
     left:18px;
-    bottom:22px;
+    bottom:142px;
 
-    z-index:12;
+    z-index:45;
 
     min-width:112px;
+
     padding:8px 11px;
+
     border-radius:20px;
 
-    background:rgba(9,26,20,.84);
+    background:rgba(9,26,20,.88);
+
     border:1px solid rgba(255,255,255,.08);
 
     color:#dce5e0;
+
     font-size:10px;
+
     text-align:center;
 }
 
 .timer b{
     color:var(--gold2);
+
     font-size:16px;
+
     margin-right:4px;
 }
 
-/* ---------- BOTTOM PLAYER STRIP ---------- */
+
+/* =========================================================
+   PLAYER HAND
+   مهم:
+   کارت‌ها داخل خود میز سبز قرار دارند
+========================================================= */
+
+.hand-wrap{
+    position:absolute;
+
+    left:7px;
+    right:7px;
+
+    bottom:7px;
+
+    height:126px;
+
+    z-index:50;
+
+    overflow:visible;
+
+    pointer-events:none;
+}
+
+.hand{
+    position:absolute;
+
+    left:50%;
+    bottom:0;
+
+    width:100%;
+    height:126px;
+
+    transform:translateX(-50%);
+
+    display:flex;
+
+    align-items:flex-end;
+    justify-content:center;
+
+    padding:0 4px;
+
+    overflow:visible;
+
+    direction:ltr;
+
+    pointer-events:none;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.card{
+    position:relative;
+
+    flex:0 0 47px;
+
+    width:47px;
+    height:90px;
+
+    margin-left:-18px;
+
+    border-radius:9px;
+
+    border:1px solid #c9c3b8;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.99),
+            rgba(249,247,241,.99) 55%,
+            rgba(229,225,216,.99)
+        );
+
+    color:#151515;
+
+    box-shadow:
+        0 8px 13px rgba(0,0,0,.50),
+        0 2px 3px rgba(0,0,0,.32),
+        inset 0 0 0 1px rgba(255,255,255,.9);
+
+    cursor:pointer;
+
+    overflow:hidden;
+
+    transform-origin:50% 112%;
+
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        filter .18s ease;
+
+    user-select:none;
+
+    pointer-events:auto;
+}
+
+.card:first-child{
+    margin-left:0;
+}
+
+.card:before{
+    content:"";
+
+    position:absolute;
+
+    inset:3px;
+
+    border:1px solid rgba(160,154,143,.55);
+
+    border-radius:6px;
+
+    pointer-events:none;
+}
+
+.card.red{
+    color:#c91d2b;
+}
+
+
+/* =========================================================
+   CARD CORNERS
+========================================================= */
+
+.card-corner{
+    position:absolute;
+
+    left:5px;
+    top:5px;
+
+    width:17px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    font-family:Georgia,"Times New Roman",serif;
+
+    font-weight:900;
+
+    line-height:.9;
+
+    z-index:3;
+}
+
+.card-corner.bottom{
+    left:auto;
+    top:auto;
+
+    right:5px;
+    bottom:5px;
+
+    transform:rotate(180deg);
+}
+
+.card-corner .rank{
+    font-size:16px;
+}
+
+.card-corner .mini-suit{
+    margin-top:2px;
+
+    font-size:11px;
+}
+
+
+/* =========================================================
+   BIG SUIT
+========================================================= */
+
+.card-center-suit{
+    position:absolute;
+
+    left:50%;
+    top:53%;
+
+    transform:translate(-50%,-50%);
+
+    font-size:37px;
+
+    line-height:1;
+
+    font-family:"Times New Roman",serif;
+
+    text-shadow:
+        0 1px 0 rgba(0,0,0,.05);
+
+    z-index:2;
+}
+
+
+/* =========================================================
+   SELECTED CARD
+========================================================= */
+
+.card.selected{
+    transform:
+        translateY(-24px)
+        rotate(0deg)!important;
+
+    z-index:100!important;
+
+    box-shadow:
+        0 16px 25px rgba(0,0,0,.62),
+        0 0 0 2px var(--gold2),
+        0 0 17px rgba(241,203,108,.3);
+}
+
+
+/* =========================================================
+   DISABLED CARD
+========================================================= */
+
+.card.disabled{
+    opacity:.38;
+
+    filter:
+        saturate(.35)
+        brightness(.9);
+}
+
+
+/* =========================================================
+   CARD FAN
+========================================================= */
+
+.card:nth-child(1){
+    transform:rotate(-18deg) translateY(13px);
+    z-index:1;
+}
+
+.card:nth-child(2){
+    transform:rotate(-15deg) translateY(9px);
+    z-index:2;
+}
+
+.card:nth-child(3){
+    transform:rotate(-12deg) translateY(6px);
+    z-index:3;
+}
+
+.card:nth-child(4){
+    transform:rotate(-9deg) translateY(3px);
+    z-index:4;
+}
+
+.card:nth-child(5){
+    transform:rotate(-6deg) translateY(1px);
+    z-index:5;
+}
+
+.card:nth-child(6){
+    transform:rotate(-3deg) translateY(-1px);
+    z-index:6;
+}
+
+.card:nth-child(7){
+    transform:rotate(0deg) translateY(-2px);
+    z-index:7;
+}
+
+.card:nth-child(8){
+    transform:rotate(3deg) translateY(-1px);
+    z-index:8;
+}
+
+.card:nth-child(9){
+    transform:rotate(6deg) translateY(1px);
+    z-index:9;
+}
+
+.card:nth-child(10){
+    transform:rotate(9deg) translateY(3px);
+    z-index:10;
+}
+
+.card:nth-child(11){
+    transform:rotate(12deg) translateY(6px);
+    z-index:11;
+}
+
+.card:nth-child(12){
+    transform:rotate(15deg) translateY(9px);
+    z-index:12;
+}
+
+.card:nth-child(13){
+    transform:rotate(18deg) translateY(13px);
+    z-index:13;
+}
+
+
+/* =========================================================
+   MY PLAYER
+========================================================= */
 
 .my-strip{
     display:flex;
+
     align-items:center;
     justify-content:space-between;
 
@@ -608,14 +1015,18 @@ button{
 
 .my-player{
     display:flex;
+
     align-items:center;
+
     gap:9px;
+
     direction:rtl;
 }
 
 .my-avatar{
     width:54px;
     height:54px;
+
     border-radius:50%;
 
     display:flex;
@@ -643,6 +1054,7 @@ button{
 
     font-family:Georgia,serif;
     font-style:italic;
+
     font-weight:700;
 
     font-size:18px;
@@ -650,295 +1062,31 @@ button{
 
 .waiting{
     padding:9px 13px;
+
     border-radius:18px;
 
     background:#111a16;
 
     color:#c5cdc8;
+
     font-size:11px;
 
     border:1px solid rgba(255,255,255,.05);
 }
 
-/* =========================================================
-   HAND - PROFESSIONAL PLAYING CARD FAN
-   ========================================================= */
-
-.hand-wrap{
-    position:relative;
-
-    height:175px;
-
-    margin:0 -3px;
-
-    overflow:visible;
-}
-
-.hand{
-    position:absolute;
-
-    left:50%;
-    bottom:0;
-
-    width:100%;
-    height:170px;
-
-    transform:translateX(-50%);
-
-    display:flex;
-    align-items:flex-end;
-    justify-content:center;
-
-    padding:0 4px;
-
-    overflow:visible;
-
-    direction:ltr;
-}
-
-/* ---------- CARD ---------- */
-
-.card{
-    position:relative;
-
-    flex:0 0 clamp(52px,14vw,78px);
-
-    width:clamp(52px,14vw,78px);
-    height:clamp(76px,19vw,108px);
-
-    /*
-       هم‌پوشانی زیاد کارت‌ها
-       برای شبیه شدن به دسته پاسور واقعی
-    */
-    margin-left:clamp(-28px,-5vw,-17px);
-
-    border-radius:9px;
-
-    border:1px solid #c7c3bb;
-
-    background:
-        linear-gradient(
-            135deg,
-            #ffffff 0%,
-            #faf9f5 48%,
-            #e8e5de 100%
-        );
-
-    color:#111;
-
-    box-shadow:
-        0 8px 15px rgba(0,0,0,.48),
-        0 2px 4px rgba(0,0,0,.35),
-        inset 0 0 0 1px rgba(255,255,255,.85);
-
-    cursor:pointer;
-
-    overflow:hidden;
-
-    transform-origin:50% 115%;
-
-    transition:
-        transform .18s ease,
-        box-shadow .18s ease,
-        filter .18s ease;
-
-    user-select:none;
-}
-
-.card:first-child{
-    margin-left:0;
-}
-
-/* حاشیه داخلی کارت */
-
-.card:before{
-    content:"";
-
-    position:absolute;
-
-    inset:3px;
-
-    border:1px solid rgba(170,165,155,.45);
-
-    border-radius:6px;
-
-    pointer-events:none;
-}
-
-/* کارت قرمز */
-
-.card.red{
-    color:#d21f2f;
-}
-
-/* ---------- CARD CORNERS ---------- */
-
-.card-corner{
-    position:absolute;
-
-    left:6px;
-    top:5px;
-
-    width:20px;
-
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-weight:900;
-
-    line-height:.9;
-
-    z-index:3;
-}
-
-.card-corner.bottom{
-    left:auto;
-    top:auto;
-
-    right:6px;
-    bottom:5px;
-
-    transform:rotate(180deg);
-}
-
-.card-corner .rank{
-    font-size:clamp(15px,4vw,21px);
-}
-
-.card-corner .mini-suit{
-    margin-top:2px;
-    font-size:clamp(11px,3vw,15px);
-}
-
-/* ---------- CENTER SUIT ---------- */
-
-.card-center-suit{
-    position:absolute;
-
-    left:50%;
-    top:53%;
-
-    transform:translate(-50%,-50%);
-
-    font-size:clamp(34px,9vw,52px);
-
-    line-height:1;
-
-    font-family:
-        "Times New Roman",
-        Georgia,
-        serif;
-
-    z-index:2;
-}
 
 /* =========================================================
-   FAN
-   ========================================================= */
-
-.card:nth-child(1){
-    transform:rotate(-20deg) translateY(14px);
-    z-index:1;
-}
-
-.card:nth-child(2){
-    transform:rotate(-17deg) translateY(10px);
-    z-index:2;
-}
-
-.card:nth-child(3){
-    transform:rotate(-14deg) translateY(6px);
-    z-index:3;
-}
-
-.card:nth-child(4){
-    transform:rotate(-11deg) translateY(3px);
-    z-index:4;
-}
-
-.card:nth-child(5){
-    transform:rotate(-8deg) translateY(0);
-    z-index:5;
-}
-
-.card:nth-child(6){
-    transform:rotate(-4deg) translateY(-3px);
-    z-index:6;
-}
-
-.card:nth-child(7){
-    transform:rotate(0deg) translateY(-5px);
-    z-index:7;
-}
-
-.card:nth-child(8){
-    transform:rotate(4deg) translateY(-3px);
-    z-index:8;
-}
-
-.card:nth-child(9){
-    transform:rotate(8deg) translateY(0);
-    z-index:9;
-}
-
-.card:nth-child(10){
-    transform:rotate(11deg) translateY(3px);
-    z-index:10;
-}
-
-.card:nth-child(11){
-    transform:rotate(14deg) translateY(6px);
-    z-index:11;
-}
-
-.card:nth-child(12){
-    transform:rotate(17deg) translateY(10px);
-    z-index:12;
-}
-
-.card:nth-child(13){
-    transform:rotate(20deg) translateY(14px);
-    z-index:13;
-}
-
-/* ---------- SELECTED CARD ---------- */
-
-.card.selected{
-    transform:
-        translateY(-30px)
-        rotate(0deg)!important;
-
-    z-index:100!important;
-
-    box-shadow:
-        0 18px 28px rgba(0,0,0,.62),
-        0 0 0 2px var(--gold2),
-        0 0 18px rgba(241,203,108,.3);
-}
-
-/* ---------- DISABLED CARD ---------- */
-
-.card.disabled{
-    opacity:.38;
-    filter:saturate(.35) brightness(.9);
-}
-
-/* ---------- CONTROLS ---------- */
+   CONTROLS
+========================================================= */
 
 .controls{
     display:flex;
+
     justify-content:center;
 
     gap:8px;
 
-    margin:2px 0 0;
+    margin:8px 0 0;
 }
 
 .btn{
@@ -951,7 +1099,11 @@ button{
     color:#fff;
 
     background:
-        linear-gradient(145deg,#1d2b24,#101814);
+        linear-gradient(
+            145deg,
+            #1d2b24,
+            #101814
+        );
 
     box-shadow:
         0 5px 12px rgba(0,0,0,.28);
@@ -964,7 +1116,11 @@ button{
 
 .btn.primary{
     background:
-        linear-gradient(145deg,#d3a747,#8f6525);
+        linear-gradient(
+            145deg,
+            #d3a747,
+            #8f6525
+        );
 
     border-color:#ebca76;
 }
@@ -973,10 +1129,14 @@ button{
     transform:scale(.96);
 }
 
-/* ---------- MODAL / MESSAGE ---------- */
+
+/* =========================================================
+   MODAL
+========================================================= */
 
 .modal{
     position:fixed;
+
     inset:0;
 
     z-index:1000;
@@ -1005,7 +1165,11 @@ button{
     border-radius:25px;
 
     background:
-        linear-gradient(145deg,#0b4f34,#0a6d45);
+        linear-gradient(
+            145deg,
+            #0b4f34,
+            #0a6d45
+        );
 
     border:2px solid var(--gold);
 
@@ -1018,18 +1182,23 @@ button{
 .modal-title{
     font-size:19px;
     font-weight:900;
+
     margin-bottom:7px;
 }
 
 .modal-subtitle{
     font-size:11px;
+
     color:#c7d1cc;
+
     margin-bottom:16px;
 }
 
 .suits{
     display:grid;
+
     grid-template-columns:repeat(2,1fr);
+
     gap:9px;
 }
 
@@ -1052,6 +1221,11 @@ button{
 .suit-btn.red{
     color:#ff5555;
 }
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
 
 .message{
     position:fixed;
@@ -1087,9 +1261,10 @@ button{
     display:block;
 }
 
+
 /* =========================================================
-   RESPONSIVE
-   ========================================================= */
+   MOBILE
+========================================================= */
 
 @media(max-width:480px){
 
@@ -1100,7 +1275,11 @@ button{
 
     .game-head{
         height:82px;
-        grid-template-columns:50px 1fr 50px;
+
+        grid-template-columns:
+            50px
+            1fr
+            50px;
     }
 
     .game-title strong{
@@ -1110,13 +1289,21 @@ button{
     .icon-btn{
         width:39px;
         height:39px;
+
         font-size:17px;
     }
 
     .table{
         height:690px;
+
         border-width:5px;
+
         border-radius:37px;
+    }
+
+    .table-top{
+        left:12px;
+        right:12px;
     }
 
     .seat{
@@ -1136,6 +1323,7 @@ button{
     .avatar{
         width:58px;
         height:58px;
+
         font-size:24px;
     }
 
@@ -1145,6 +1333,7 @@ button{
 
     .center{
         top:190px;
+
         transform:
             translateX(-50%)
             scale(.9);
@@ -1152,44 +1341,97 @@ button{
 
     .timer{
         left:12px;
-        bottom:17px;
+
+        bottom:128px;
+
+        min-width:105px;
+    }
+
+    /* کارت‌ها */
+
+    .hand-wrap{
+        left:5px;
+        right:5px;
+
+        bottom:7px;
+
+        height:116px;
+    }
+
+    .hand{
+        height:116px;
+
+        padding:0 2px;
+    }
+
+    .card{
+        flex:0 0 43px;
+
+        width:43px;
+        height:82px;
+
+        margin-left:-17px;
+    }
+
+    .card:first-child{
+        margin-left:0;
+    }
+
+    .card-corner{
+        left:4px;
+        top:4px;
+    }
+
+    .card-corner.bottom{
+        right:4px;
+        bottom:4px;
+    }
+
+    .card-corner .rank{
+        font-size:14px;
+    }
+
+    .card-corner .mini-suit{
+        font-size:10px;
+    }
+
+    .card-center-suit{
+        font-size:34px;
     }
 
     .my-strip{
         margin-left:10px;
         margin-right:10px;
     }
-
-    .hand-wrap{
-        height:165px;
-    }
-
-    .hand{
-        height:160px;
-    }
 }
 
-/* ---------- SMALL PHONES ---------- */
+
+/* =========================================================
+   VERY SMALL PHONES
+========================================================= */
 
 @media(max-width:380px){
 
     .table{
         height:650px;
+
         border-width:4px;
     }
 
     .table-top{
-        left:12px;
-        right:12px;
+        left:10px;
+        right:10px;
     }
 
     .hokm-pill{
         min-width:88px;
+
         font-size:9px;
     }
 
     .turn-pill{
         max-width:125px;
+
         font-size:9px;
     }
 
@@ -1206,48 +1448,80 @@ button{
             scale(.8);
     }
 
+    .timer{
+        bottom:118px;
+        left:10px;
+    }
+
     .hand-wrap{
-        height:150px;
+        left:3px;
+        right:3px;
+
+        bottom:6px;
+
+        height:106px;
     }
 
     .hand{
-        height:145px;
+        height:106px;
     }
 
     .card{
-        width:45px;
-        height:66px;
-        margin-left:-17px;
+        flex:0 0 39px;
+
+        width:39px;
+        height:75px;
+
+        margin-left:-15px;
+    }
+
+    .card-corner .rank{
+        font-size:13px;
+    }
+
+    .card-corner .mini-suit{
+        font-size:9px;
+    }
+
+    .card-center-suit{
+        font-size:30px;
     }
 }
 </style>
 </head>
 
+
 <body>
 
 <div class="page">
 
-    <!-- ================= GAME HEADER ================= -->
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
 
     <header class="game-head">
 
         <div class="head-side">
             <button
                 class="icon-btn"
-                onclick="tg && tg.close ? tg.close() : null"
-            >×</button>
+                onclick="tg && tg.close ? tg.close() : null">
+                ×
+            </button>
         </div>
 
         <div class="game-title">
 
             <strong>حکم</strong>
 
-            <span>میز بازی گرین‌دریم</span>
+            <span>
+                میز بازی گرین‌دریم
+            </span>
 
             <span
                 id="roundInfo"
-                class="round-pill"
-            >دست ۱</span>
+                class="round-pill">
+                دست ۱
+            </span>
 
         </div>
 
@@ -1255,25 +1529,32 @@ button{
 
             <button
                 class="icon-btn"
-                onclick="showMessage('پنل بازی')"
-            >⋯</button>
+                onclick="showMessage('پنل بازی')">
+                ⋯
+            </button>
 
         </div>
 
     </header>
 
-    <!-- ================= SCORE ================= -->
+
+    <!-- =====================================================
+         SCORE
+    ====================================================== -->
 
     <div class="score-row">
 
         <div class="score-box">
 
-            <span id="teamAName">ما</span>
+            <span id="teamAName">
+                ما
+            </span>
 
             <span
                 id="teamAScore"
-                class="score"
-            >۰</span>
+                class="score">
+                ۰
+            </span>
 
         </div>
 
@@ -1283,47 +1564,57 @@ button{
 
         <div class="score-box">
 
-            <span id="teamBName">حریف</span>
+            <span id="teamBName">
+                حریف
+            </span>
 
             <span
                 id="teamBScore"
-                class="score"
-            >۰</span>
+                class="score">
+                ۰
+            </span>
 
         </div>
 
     </div>
 
-    <!-- ================= TABLE ================= -->
+
+    <!-- =====================================================
+         TABLE
+    ====================================================== -->
 
     <section class="table">
 
-        <!-- TABLE INFO -->
+
+        <!-- TABLE INFORMATION -->
 
         <div class="table-top">
 
             <div
                 id="hokmInfo"
-                class="hokm-pill"
-            >
-                حکم: <b>—</b>
+                class="hokm-pill">
+
+                حکم:
+                <b>—</b>
+
             </div>
 
             <div
                 id="turnInfo"
-                class="turn-pill"
-            >
+                class="turn-pill">
+
                 در حال دریافت وضعیت...
+
             </div>
 
         </div>
+
 
         <!-- TOP PLAYER -->
 
         <div
             id="seatTop"
-            class="seat top"
-        >
+            class="seat top">
 
             <div class="avatar">
                 ♞
@@ -1339,12 +1630,12 @@ button{
 
         </div>
 
+
         <!-- LEFT PLAYER -->
 
         <div
             id="seatLeft"
-            class="seat left"
-        >
+            class="seat left">
 
             <div class="avatar">
                 🐱
@@ -1360,12 +1651,12 @@ button{
 
         </div>
 
+
         <!-- RIGHT PLAYER -->
 
         <div
             id="seatRight"
-            class="seat right"
-        >
+            class="seat right">
 
             <div class="avatar">
                 🐯
@@ -1381,7 +1672,10 @@ button{
 
         </div>
 
-        <!-- CENTER -->
+
+        <!-- =================================================
+             CENTER OF TABLE
+        ================================================== -->
 
         <div class="center">
 
@@ -1391,24 +1685,27 @@ button{
 
             <div
                 id="trick"
-                class="trick"
-            ></div>
+                class="trick">
+            </div>
 
             <div
                 id="hokmBox"
-                class="hokm-center empty"
-            >
+                class="hokm-center empty">
+
                 حکم —
+
             </div>
 
         </div>
 
-        <!-- TIMER -->
+
+        <!-- =================================================
+             TIMER
+        ================================================== -->
 
         <div
             id="timer"
-            class="timer"
-        >
+            class="timer">
 
             زمان نوبت
 
@@ -1418,18 +1715,39 @@ button{
 
         </div>
 
+
+        <!-- =================================================
+             PLAYER HAND
+             این قسمت عمداً داخل میز قرار دارد
+        ================================================== -->
+
+        <div class="hand-wrap">
+
+            <div
+                id="hand"
+                class="hand">
+            </div>
+
+        </div>
+
+
     </section>
 
-    <!-- ================= MY PLAYER ================= -->
+
+    <!-- =====================================================
+         MY PLAYER
+    ====================================================== -->
 
     <div class="my-strip">
 
         <div
             id="waiting"
-            class="waiting"
-        >
+            class="waiting">
+
             منتظر بازیکنان...
+
         </div>
+
 
         <div class="my-player">
 
@@ -1437,71 +1755,75 @@ button{
 
                 <div
                     id="myName"
-                    class="my-name"
-                >
+                    class="my-name">
+
                     بازیکن
+
                 </div>
 
                 <div
                     id="bottomInfo"
-                    style="color:#9da9a3;font-size:9px;margin-top:3px"
-                >
+                    style="
+                        color:#9da9a3;
+                        font-size:9px;
+                        margin-top:3px;
+                    ">
+
                     دست شما
+
                 </div>
 
             </div>
 
+
             <div
                 id="myAvatar"
-                class="my-avatar"
-            >
+                class="my-avatar">
+
                 🦉
+
             </div>
 
         </div>
 
     </div>
 
-    <!-- ================= PLAYER HAND ================= -->
 
-    <div class="hand-wrap">
-
-        <div
-            id="hand"
-            class="hand"
-        ></div>
-
-    </div>
-
-    <!-- ================= CONTROLS ================= -->
+    <!-- =====================================================
+         CONTROLS
+    ====================================================== -->
 
     <div class="controls">
 
         <button
             id="startBtn"
             class="btn primary"
-            onclick="startGame()"
-        >
+            onclick="startGame()">
+
             🎮 شروع بازی
+
         </button>
 
         <button
             class="btn"
-            onclick="loadGame()"
-        >
+            onclick="loadGame()">
+
             ↻ بروزرسانی
+
         </button>
 
     </div>
 
 </div>
 
-<!-- ================= HOKM MODAL ================= -->
+
+<!-- =========================================================
+     HOKM MODAL
+========================================================= -->
 
 <div
     id="hokmModal"
-    class="modal"
->
+    class="modal">
 
     <div class="modal-box">
 
@@ -1517,29 +1839,25 @@ button{
 
             <button
                 class="suit-btn red"
-                onclick="chooseHokm('♥')"
-            >
+                onclick="chooseHokm('♥')">
                 ♥
             </button>
 
             <button
                 class="suit-btn red"
-                onclick="chooseHokm('♦')"
-            >
+                onclick="chooseHokm('♦')">
                 ♦
             </button>
 
             <button
                 class="suit-btn"
-                onclick="chooseHokm('♣')"
-            >
+                onclick="chooseHokm('♣')">
                 ♣
             </button>
 
             <button
                 class="suit-btn"
-                onclick="chooseHokm('♠')"
-            >
+                onclick="chooseHokm('♠')">
                 ♠
             </button>
 
@@ -1549,18 +1867,22 @@ button{
 
 </div>
 
-<!-- ================= MESSAGE ================= -->
+
+<!-- =========================================================
+     MESSAGE
+========================================================= -->
 
 <div
     id="message"
-    class="message"
-></div>
+    class="message">
+</div>
+
 
 <script>
 
 /* =========================================================
    TELEGRAM
-   ========================================================= */
+========================================================= */
 
 const tg =
     window.Telegram &&
@@ -1576,9 +1898,10 @@ if(tg){
 
 }
 
+
 /* =========================================================
-   GAME PARAMS
-   ========================================================= */
+   GAME VARIABLES
+========================================================= */
 
 const params =
     new URLSearchParams(
@@ -1593,9 +1916,10 @@ let currentState = null;
 
 let messageTimer = null;
 
+
 /* =========================================================
-   API HEADERS
-   ========================================================= */
+   HEADERS
+========================================================= */
 
 function headers(){
 
@@ -1603,19 +1927,24 @@ function headers(){
         "Content-Type":"application/json"
     };
 
-    if(tg && tg.initData){
+    if(
+        tg &&
+        tg.initData
+    ){
 
-        result["X-Telegram-Init-Data"] =
-            tg.initData;
+        result[
+            "X-Telegram-Init-Data"
+        ] = tg.initData;
 
     }
 
     return result;
 }
 
+
 /* =========================================================
    API
-   ========================================================= */
+========================================================= */
 
 async function api(
     url,
@@ -1630,7 +1959,7 @@ async function api(
 
                 headers:{
                     ...headers(),
-                    ...(options.headers||{})
+                    ...(options.headers || {})
                 }
             }
         );
@@ -1642,7 +1971,11 @@ async function api(
         data =
             await response.json();
 
-    }catch{}
+    }catch{
+
+        data={};
+
+    }
 
     if(!response.ok){
 
@@ -1656,9 +1989,10 @@ async function api(
     return data;
 }
 
+
 /* =========================================================
    MESSAGE
-   ========================================================= */
+========================================================= */
 
 function showMessage(text){
 
@@ -1671,37 +2005,58 @@ function showMessage(text){
 
     box.classList.add("show");
 
-    clearTimeout(messageTimer);
+    clearTimeout(
+        messageTimer
+    );
 
     messageTimer =
         setTimeout(
-            () =>
+            ()=>{
                 box.classList.remove(
                     "show"
-                ),
+                );
+            },
             2600
         );
 }
 
+
 /* =========================================================
    ESCAPE HTML
-   ========================================================= */
+========================================================= */
 
 function escapeHtml(value){
 
     return String(
         value ?? ""
     )
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
 }
+
 
 /* =========================================================
    CARD HELPERS
-   ========================================================= */
+========================================================= */
 
 function cardIsRed(suit){
 
@@ -1716,17 +2071,19 @@ function initials(name){
 
     const s =
         String(
-            name||"؟"
+            name || "؟"
         ).trim();
 
     return s
         ? s.slice(0,1).toUpperCase()
         : "؟";
+
 }
 
+
 /* =========================================================
-   SCORE
-   ========================================================= */
+   SCORE UI
+========================================================= */
 
 function setScoreUI(state){
 
@@ -1750,6 +2107,7 @@ function setScoreUI(state){
         "teamBScore"
     ).textContent = b;
 
+
     if(state.team_a_name){
 
         document.getElementById(
@@ -1758,6 +2116,7 @@ function setScoreUI(state){
             state.team_a_name;
 
     }
+
 
     if(state.team_b_name){
 
@@ -1768,20 +2127,23 @@ function setScoreUI(state){
 
     }
 
+
     if(state.round != null){
 
         document.getElementById(
             "roundInfo"
         ).textContent =
-            "دست " + state.round;
+            "دست " +
+            state.round;
 
     }
 
 }
 
+
 /* =========================================================
    LOAD GAME
-   ========================================================= */
+========================================================= */
 
 async function loadGame(){
 
@@ -1793,7 +2155,9 @@ async function loadGame(){
             "❌ شناسه بازی پیدا نشد";
 
         return;
+
     }
+
 
     try{
 
@@ -1802,7 +2166,8 @@ async function loadGame(){
                 `/api/game/${gameId}`
             );
 
-        currentState = state;
+        currentState =
+            state;
 
         render(state);
 
@@ -1811,19 +2176,22 @@ async function loadGame(){
         document.getElementById(
             "turnInfo"
         ).textContent =
-            "❌ " + error.message;
+            "❌ " +
+            error.message;
 
     }
 
 }
 
+
 /* =========================================================
    RENDER
-   ========================================================= */
+========================================================= */
 
 function render(state){
 
     setScoreUI(state);
+
 
     document.getElementById(
         "turnInfo"
@@ -1839,23 +2207,28 @@ function render(state){
                 "در حال بازی"
             );
 
+
     const hokm =
         state.hokm || "—";
+
 
     document.getElementById(
         "hokmInfo"
     ).innerHTML =
         `حکم: <b>${escapeHtml(hokm)}</b>`;
 
+
     const hokmBox =
         document.getElementById(
             "hokmBox"
         );
 
+
     if(state.hokm){
 
         hokmBox.textContent =
-            "حکم " + state.hokm;
+            "حکم " +
+            state.hokm;
 
         hokmBox.classList.remove(
             "empty"
@@ -1872,16 +2245,19 @@ function render(state){
 
     }
 
+
     renderSeats(state);
 
     renderTrick(state);
 
     renderHand(state);
 
+
     const startBtn =
         document.getElementById(
             "startBtn"
         );
+
 
     if(state.started){
 
@@ -1891,8 +2267,13 @@ function render(state){
     }else{
 
         startBtn.style.display =
-            Number(state.viewer_id) ===
-            Number(state.creator_id)
+
+            Number(
+                state.viewer_id
+            ) ===
+            Number(
+                state.creator_id
+            )
 
                 ? "inline-block"
 
@@ -1900,23 +2281,33 @@ function render(state){
 
     }
 
+
     document
-        .getElementById("hokmModal")
+        .getElementById(
+            "hokmModal"
+        )
         .classList.toggle(
             "show",
 
             state.phase ===
-                "choose_hokm" &&
+                "choose_hokm"
 
-            Number(state.viewer_id) ===
-            Number(state.hakim_id)
+            &&
+
+            Number(
+                state.viewer_id
+            ) ===
+            Number(
+                state.hakim_id
+            )
         );
 
 }
 
+
 /* =========================================================
-   SEAT
-   ========================================================= */
+   UPDATE SEAT
+========================================================= */
 
 function updateSeat(
     seat,
@@ -1927,6 +2318,7 @@ function updateSeat(
         "turn",
         "empty-seat"
     );
+
 
     const avatar =
         seat.querySelector(
@@ -1943,9 +2335,13 @@ function updateSeat(
             ".seat-meta"
         );
 
+
     seat
-        .querySelector(".crown")
+        .querySelector(
+            ".crown"
+        )
         ?.remove();
+
 
     if(!player){
 
@@ -1953,25 +2349,34 @@ function updateSeat(
             "empty-seat"
         );
 
-        avatar.textContent = "•";
+        avatar.textContent =
+            "•";
 
         name.textContent =
             "صندلی خالی";
 
-        meta.textContent = "";
+        meta.textContent =
+            "";
 
         return;
+
     }
+
 
     avatar.textContent =
         player.avatar ||
-        initials(player.name);
+        initials(
+            player.name
+        );
+
 
     name.textContent =
         player.name ||
         "بازیکن";
 
+
     let metaText=[];
+
 
     if(player.is_turn){
 
@@ -1985,6 +2390,7 @@ function updateSeat(
 
     }
 
+
     if(player.is_bot){
 
         metaText.push(
@@ -1993,9 +2399,11 @@ function updateSeat(
 
     }
 
+
     meta.textContent =
         metaText.join(" • ") ||
         "در بازی";
+
 
     if(player.is_hakim){
 
@@ -2018,14 +2426,16 @@ function updateSeat(
 
 }
 
+
 /* =========================================================
    RENDER SEATS
-   ========================================================= */
+========================================================= */
 
 function renderSeats(state){
 
     const players =
         state.players || [];
+
 
     const me =
         players.find(
@@ -2034,12 +2444,14 @@ function renderSeats(state){
                 Number(state.viewer_id)
         );
 
+
     const others =
         players.filter(
             p =>
                 Number(p.id) !==
                 Number(state.viewer_id)
         );
+
 
     updateSeat(
         document.getElementById(
@@ -2048,6 +2460,7 @@ function renderSeats(state){
         others[0]
     );
 
+
     updateSeat(
         document.getElementById(
             "seatRight"
@@ -2055,12 +2468,14 @@ function renderSeats(state){
         others[1]
     );
 
+
     updateSeat(
         document.getElementById(
             "seatLeft"
         ),
         others[2]
     );
+
 
     if(me){
 
@@ -2070,15 +2485,20 @@ function renderSeats(state){
             me.name ||
             "بازیکن";
 
+
         document.getElementById(
             "myAvatar"
         ).textContent =
             me.avatar ||
-            initials(me.name);
+            initials(
+                me.name
+            );
+
 
         let info =
             state.status_text ||
             "دست شما";
+
 
         if(me.is_turn){
 
@@ -2087,6 +2507,7 @@ function renderSeats(state){
 
         }
 
+
         if(me.is_hakim){
 
             info +=
@@ -2094,10 +2515,12 @@ function renderSeats(state){
 
         }
 
+
         document.getElementById(
             "bottomInfo"
         ).textContent =
             info;
+
 
         document.getElementById(
             "waiting"
@@ -2116,9 +2539,10 @@ function renderSeats(state){
 
 }
 
+
 /* =========================================================
    RENDER TRICK
-   ========================================================= */
+========================================================= */
 
 function renderTrick(state){
 
@@ -2127,10 +2551,14 @@ function renderTrick(state){
             "trick"
         );
 
-    trick.innerHTML = "";
+
+    trick.innerHTML="";
+
 
     const cards =
-        state.current_trick || [];
+        state.current_trick ||
+        [];
+
 
     cards.forEach(
         (item,index)=>{
@@ -2140,13 +2568,16 @@ function renderTrick(state){
 
             if(!card)return;
 
+
             const div =
                 document.createElement(
                     "div"
                 );
 
+
             div.className =
                 "played " +
+
                 (
                     cardIsRed(
                         card.suit
@@ -2154,17 +2585,22 @@ function renderTrick(state){
                         ? "red "
                         : ""
                 ) +
+
                 "p" +
                 (index+1);
 
-            div.innerHTML =
 
-                `<div class="rank">
+            div.innerHTML =
+                `
+                <div class="rank">
                     ${escapeHtml(card.label)}
-                 </div>
-                 <div class="suit">
+                </div>
+
+                <div class="suit">
                     ${escapeHtml(card.suit)}
-                 </div>`;
+                </div>
+                `;
+
 
             trick.appendChild(
                 div
@@ -2175,9 +2611,10 @@ function renderTrick(state){
 
 }
 
+
 /* =========================================================
-   RENDER HAND
-   ========================================================= */
+   RENDER PLAYER HAND
+========================================================= */
 
 function renderHand(state){
 
@@ -2186,23 +2623,32 @@ function renderHand(state){
             "hand"
         );
 
-    hand.innerHTML = "";
+
+    hand.innerHTML="";
+
 
     const me =
-        (state.players||[])
+        (state.players || [])
         .find(
             p =>
                 Number(p.id) ===
                 Number(state.viewer_id)
         );
 
+
     if(!me)return;
+
 
     const cards =
         me.cards || [];
 
+
     const canPlay =
-        state.phase === "playing" &&
+        state.phase ===
+            "playing"
+
+        &&
+
         Number(
             state.current_player_id
         ) ===
@@ -2210,22 +2656,28 @@ function renderHand(state){
             state.viewer_id
         );
 
+
     let legal=[];
+
 
     if(canPlay){
 
         const trick =
-            state.current_trick || [];
+            state.current_trick ||
+            [];
+
 
         const lead =
             state.lead_suit;
+
 
         if(
             trick.length === 0 ||
             !lead
         ){
 
-            legal = cards;
+            legal =
+                cards;
 
         }else{
 
@@ -2236,6 +2688,7 @@ function renderHand(state){
                         lead
                 );
 
+
             legal =
                 sameSuit.length
                     ? sameSuit
@@ -2245,6 +2698,7 @@ function renderHand(state){
 
     }
 
+
     cards.forEach(
         card=>{
 
@@ -2253,14 +2707,23 @@ function renderHand(state){
                     "div"
                 );
 
+
             const legalCard =
                 legal.some(
                     item =>
                         item.suit ===
-                            card.suit &&
-                        Number(item.rank) ===
-                            Number(card.rank)
+                            card.suit
+
+                        &&
+
+                        Number(
+                            item.rank
+                        ) ===
+                        Number(
+                            card.rank
+                        )
                 );
+
 
             div.className =
                 "card " +
@@ -2280,19 +2743,23 @@ function renderHand(state){
                         : ""
                 );
 
+
             const rank =
                 escapeHtml(
                     card.label
                 );
+
 
             const suit =
                 escapeHtml(
                     card.suit
                 );
 
+
             div.innerHTML =
 
-                `<div class="card-corner top">
+                `
+                <div class="card-corner top">
 
                     <span class="rank">
                         ${rank}
@@ -2304,9 +2771,11 @@ function renderHand(state){
 
                 </div>
 
+
                 <div class="card-center-suit">
                     ${suit}
                 </div>
+
 
                 <div class="card-corner bottom">
 
@@ -2318,7 +2787,9 @@ function renderHand(state){
                         ${suit}
                     </span>
 
-                </div>`;
+                </div>
+                `;
+
 
             if(
                 canPlay &&
@@ -2335,6 +2806,7 @@ function renderHand(state){
 
             }
 
+
             hand.appendChild(
                 div
             );
@@ -2344,13 +2816,15 @@ function renderHand(state){
 
 }
 
+
 /* =========================================================
    START GAME
-   ========================================================= */
+========================================================= */
 
 async function startGame(){
 
     if(!gameId)return;
+
 
     try{
 
@@ -2360,6 +2834,7 @@ async function startGame(){
                 method:"POST"
             }
         );
+
 
         await loadGame();
 
@@ -2373,15 +2848,17 @@ async function startGame(){
 
 }
 
+
 /* =========================================================
    CHOOSE HOKM
-   ========================================================= */
+========================================================= */
 
 async function chooseHokm(
     suit
 ){
 
     if(!gameId)return;
+
 
     try{
 
@@ -2393,6 +2870,7 @@ async function chooseHokm(
                 "show"
             );
 
+
         await api(
             `/api/game/${gameId}/hokm`,
             {
@@ -2400,10 +2878,11 @@ async function chooseHokm(
 
                 body:
                     JSON.stringify({
-                        suit
+                        suit:suit
                     })
             }
         );
+
 
         await loadGame();
 
@@ -2417,9 +2896,10 @@ async function chooseHokm(
 
 }
 
+
 /* =========================================================
    PLAY CARD
-   ========================================================= */
+========================================================= */
 
 async function playCard(
     suit,
@@ -2434,7 +2914,9 @@ async function playCard(
     ){
 
         return;
+
     }
+
 
     if(
         Number(
@@ -2450,11 +2932,14 @@ async function playCard(
         );
 
         return;
+
     }
+
 
     element.classList.add(
         "selected"
     );
+
 
     try{
 
@@ -2465,11 +2950,12 @@ async function playCard(
 
                 body:
                     JSON.stringify({
-                        suit,
-                        rank
+                        suit:suit,
+                        rank:rank
                     })
             }
         );
+
 
         await loadGame();
 
@@ -2487,15 +2973,17 @@ async function playCard(
 
 }
 
+
 /* =========================================================
    INITIAL LOAD
-   ========================================================= */
+========================================================= */
 
 loadGame();
 
+
 /* =========================================================
    AUTO REFRESH
-   ========================================================= */
+========================================================= */
 
 setInterval(
     loadGame,
