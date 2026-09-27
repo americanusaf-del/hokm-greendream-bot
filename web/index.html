@@ -216,8 +216,6 @@ button{
     overflow:hidden;
 }
 
-/* خطوط ظریف میز */
-
 .table::before{
     content:"";
     position:absolute;
@@ -382,7 +380,7 @@ button{
     font-size:8px;
 }
 
-/* ---------------- AHORAMEHR CENTER ---------------- */
+/* ---------------- CENTER ---------------- */
 
 .ahuramehr{
     position:absolute;
@@ -636,8 +634,6 @@ button{
     pointer-events:none;
 }
 
-/* کارت */
-
 .card{
     position:relative;
 
@@ -725,8 +721,6 @@ button{
     transform:rotate(180deg);
 }
 
-/* fan */
-
 .card:nth-child(1){transform:rotate(-10deg) translateY(3px);}
 .card:nth-child(2){transform:rotate(-8deg) translateY(1px);}
 .card:nth-child(3){transform:rotate(-6deg) translateY(-1px);}
@@ -798,8 +792,6 @@ button{
     border:1px solid rgba(214,188,94,.3);
     color:#ddcc8b;
 }
-
-/* وقتی بازی شروع شده، کنترل رفرش کوچک */
 
 #refreshBtn{
     min-width:auto;
@@ -1087,22 +1079,23 @@ button{
 
 <div class="page">
 
-    <!-- HEADER -->
     <header class="game-head">
 
-        <button class="head-btn" id="menuBtn">•••</button>
+        <button class="head-btn" id="menuBtn">
+            •••
+        </button>
 
         <div class="brand">
             <h1>حکم گرین‌دریم</h1>
             <p>میز بازی آنلاین</p>
         </div>
 
-        <button class="head-btn" id="closeBtn">×</button>
+        <button class="head-btn" id="closeBtn">
+            ×
+        </button>
 
     </header>
 
-
-    <!-- SCORE -->
     <div class="score-row">
 
         <div class="score-box">
@@ -1121,11 +1114,8 @@ button{
 
     </div>
 
-
-    <!-- TABLE -->
     <section class="table">
 
-        <!-- top information -->
         <div class="table-top">
 
             <div class="status-pill" id="turnText">
@@ -1138,8 +1128,6 @@ button{
 
         </div>
 
-
-        <!-- TOP PLAYER -->
         <div id="seatTop" class="seat top">
 
             <div class="avatar">•</div>
@@ -1154,8 +1142,6 @@ button{
 
         </div>
 
-
-        <!-- LEFT PLAYER -->
         <div id="seatLeft" class="seat left">
 
             <div class="avatar">•</div>
@@ -1170,8 +1156,6 @@ button{
 
         </div>
 
-
-        <!-- RIGHT PLAYER -->
         <div id="seatRight" class="seat right">
 
             <div class="avatar">•</div>
@@ -1186,8 +1170,6 @@ button{
 
         </div>
 
-
-        <!-- AHORAMEHR -->
         <div class="ahuramehr">
 
             <div class="ahuramehr-title">
@@ -1202,8 +1184,6 @@ button{
 
         </div>
 
-
-        <!-- PLAYED CARDS -->
         <div class="center" id="trick">
 
             <div class="center-label">
@@ -1212,14 +1192,10 @@ button{
 
         </div>
 
-
-        <!-- TIMER -->
         <div class="timer" id="timer">
             زمان نوبت: ۳۰
         </div>
 
-
-        <!-- MY PLAYER -->
         <div class="my-strip">
 
             <div class="my-avatar" id="myAvatar">
@@ -1232,8 +1208,6 @@ button{
 
         </div>
 
-
-        <!-- CONTROLS -->
         <div class="controls" id="controls">
 
             <button
@@ -1256,8 +1230,6 @@ button{
 
         </div>
 
-
-        <!-- HAND -->
         <div class="hand-wrap">
 
             <div id="hand" class="hand"></div>
@@ -1268,8 +1240,6 @@ button{
 
 </div>
 
-
-<!-- HOKM MODAL -->
 
 <div id="hokmModal" class="modal">
 
@@ -1332,28 +1302,110 @@ const tg =
         : null;
 
 if(tg){
+
     tg.ready();
+
     tg.expand();
 
     try{
         tg.disableVerticalSwipes();
     }catch(e){}
+
 }
 
 
 /* =========================================================
-   GAME
+   GAME ID
 ========================================================= */
 
-const params = new URLSearchParams(window.location.search);
+const params =
+    new URLSearchParams(
+        window.location.search
+    );
+
+
+/*
+   تلگرام وقتی از Main Mini App با
+   ?startapp=... باز می‌شود، شناسه را
+   معمولاً در این دو جا در اختیار Mini App
+   قرار می‌دهد:
+
+   1. tg.initDataUnsafe.start_param
+   2. tgWebAppStartParam در URL
+
+   همچنین روش‌های قبلی خودمان را حفظ می‌کنیم.
+*/
+
+const telegramStartParam =
+    tg &&
+    tg.initDataUnsafe
+        ? tg.initDataUnsafe.start_param
+        : null;
+
 
 const gameId =
+    telegramStartParam ||
+    params.get("tgWebAppStartParam") ||
+    params.get("startapp") ||
     params.get("game") ||
-    params.get("game_id");
+    params.get("game_id") ||
+    null;
+
+
+/* برای تست در console */
+
+console.log(
+    "Hokm game id:",
+    gameId
+);
+
 
 let currentState = null;
 
 let messageTimer = null;
+
+
+/* =========================================================
+   VIEWER
+========================================================= */
+
+function viewerId(state){
+
+    if(!state){
+        return null;
+    }
+
+    return (
+        state.viewer_id ??
+        state.user_id ??
+        state.viewer_player_id ??
+        state.user_player_id ??
+        null
+    );
+}
+
+
+function findViewerPlayer(state){
+
+    const id =
+        viewerId(state);
+
+    if(
+        id === null ||
+        id === undefined
+    ){
+        return null;
+    }
+
+    const players =
+        state.players || [];
+
+    return players.find(
+        player =>
+            String(player.id) ===
+            String(id)
+    ) || null;
+}
 
 
 /* =========================================================
@@ -1363,14 +1415,18 @@ let messageTimer = null;
 function headers(){
 
     const h = {
-        "Content-Type":"application/json"
+        "Content-Type":
+            "application/json"
     };
 
     if(
         tg &&
         tg.initData
     ){
-        h["X-Telegram-Init-Data"] =
+
+        h[
+            "X-Telegram-Init-Data"
+        ] =
             tg.initData;
     }
 
@@ -1378,13 +1434,17 @@ function headers(){
 }
 
 
-async function api(url, options={}){
+async function api(
+    url,
+    options={}
+){
 
     const response =
         await fetch(
             url,
             {
                 ...options,
+
                 headers:{
                     ...headers(),
                     ...(options.headers || {})
@@ -1392,13 +1452,19 @@ async function api(url, options={}){
             }
         );
 
+
     let data = null;
 
     try{
-        data = await response.json();
+
+        data =
+            await response.json();
+
     }catch(e){
+
         data = {};
     }
+
 
     if(!response.ok){
 
@@ -1409,6 +1475,7 @@ async function api(url, options={}){
             "خطا در ارتباط با سرور"
         );
     }
+
 
     return data;
 }
@@ -1421,18 +1488,27 @@ async function api(url, options={}){
 function showMessage(text){
 
     const el =
-        document.getElementById("message");
+        document.getElementById(
+            "message"
+        );
 
-    el.textContent = text;
+    el.textContent =
+        text;
 
-    el.classList.add("show");
+    el.classList.add(
+        "show"
+    );
 
-    clearTimeout(messageTimer);
+    clearTimeout(
+        messageTimer
+    );
 
     messageTimer =
         setTimeout(
             ()=>{
-                el.classList.remove("show");
+                el.classList.remove(
+                    "show"
+                );
             },
             2600
         );
@@ -1445,26 +1521,47 @@ function showMessage(text){
 
 function escapeHtml(value){
 
-    return String(value ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
+    return String(
+        value ?? ""
+    )
+        .replaceAll(
+            "&",
+            "&amp;"
+        )
+        .replaceAll(
+            "<",
+            "&lt;"
+        )
+        .replaceAll(
+            ">",
+            "&gt;"
+        )
+        .replaceAll(
+            '"',
+            "&quot;"
+        )
+        .replaceAll(
+            "'",
+            "&#039;"
+        );
 }
 
 
 function cardIsRed(suit){
 
-    return suit === "♥" ||
-           suit === "♦";
+    return (
+        suit === "♥" ||
+        suit === "♦"
+    );
 }
 
 
 function initials(name){
 
     const text =
-        String(name || "A").trim();
+        String(
+            name || "A"
+        ).trim();
 
     if(!text){
         return "A";
@@ -1473,7 +1570,9 @@ function initials(name){
     return text
         .split(/\s+/)
         .slice(0,2)
-        .map(x => x[0])
+        .map(
+            x => x[0]
+        )
         .join("")
         .toUpperCase();
 }
@@ -1489,17 +1588,6 @@ function getPlayers(state){
 }
 
 
-function getMe(state){
-
-    return (
-        state.me ||
-        state.viewer ||
-        state.current_user ||
-        null
-    );
-}
-
-
 /* =========================================================
    SCORE
 ========================================================= */
@@ -1507,22 +1595,31 @@ function getMe(state){
 function setScoreUI(state){
 
     const score1 =
+        state.team_a_score ??
         state.score_us ??
         state.team1_score ??
         state.score1 ??
         0;
 
+
     const score2 =
+        state.team_b_score ??
         state.score_them ??
         state.team2_score ??
         state.score2 ??
         0;
 
-    document.getElementById("score1")
-        .textContent = score1;
 
-    document.getElementById("score2")
-        .textContent = score2;
+    document
+        .getElementById("score1")
+        .textContent =
+            score1;
+
+
+    document
+        .getElementById("score2")
+        .textContent =
+            score2;
 }
 
 
@@ -1538,8 +1635,28 @@ async function loadGame(){
             "شناسه بازی پیدا نشد"
         );
 
+        console.error(
+            "No game id found",
+            {
+                url:
+                    window.location.href,
+
+                search:
+                    window.location.search,
+
+                startParam:
+                    telegramStartParam,
+
+                initDataUnsafe:
+                    tg
+                        ? tg.initDataUnsafe
+                        : null
+            }
+        );
+
         return;
     }
+
 
     try{
 
@@ -1548,13 +1665,21 @@ async function loadGame(){
                 `/api/game/${encodeURIComponent(gameId)}`
             );
 
-        currentState = state;
 
-        render(state);
+        currentState =
+            state;
+
+
+        render(
+            state
+        );
+
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
 
         showMessage(
             error.message ||
@@ -1574,74 +1699,125 @@ function render(state){
         return;
     }
 
-    setScoreUI(state);
 
-    renderSeats(state);
-
-    renderTrick(state);
-
-    renderHand(state);
+    setScoreUI(
+        state
+    );
 
 
-    /* حکم */
+    renderSeats(
+        state
+    );
+
+
+    renderTrick(
+        state
+    );
+
+
+    renderHand(
+        state
+    );
+
 
     const hokm =
         state.hokm ||
         state.trump ||
         null;
 
-    document.getElementById("hokmText")
+
+    document
+        .getElementById(
+            "hokmText"
+        )
         .textContent =
-            `حکم: ${hokm || "—"}`;
+            `حکم: ${
+                hokm || "—"
+            }`;
 
-
-    /* نوبت */
 
     const turnEl =
-        document.getElementById("turnText");
+        document.getElementById(
+            "turnText"
+        );
+
 
     const phase =
         state.phase ||
         "waiting";
 
-    if(phase === "waiting"){
+
+    const myId =
+        viewerId(
+            state
+        );
+
+
+    if(
+        phase === "waiting"
+    ){
 
         turnEl.textContent =
             "منتظر شروع بازی";
+
 
     }else if(
         phase === "choose_hokm"
     ){
 
-        turnEl.textContent =
-            "انتخاب حکم";
+        if(
+            state.hakim_id &&
+            myId &&
+            String(
+                state.hakim_id
+            ) ===
+            String(myId)
+        ){
+
+            turnEl.textContent =
+                "👑 شما حاکم هستید؛ حکم را انتخاب کنید";
+
+        }else{
+
+            turnEl.textContent =
+                "انتظار برای انتخاب حکم";
+        }
+
 
     }else if(
         phase === "playing"
     ){
 
-        const me =
-            getMe(state);
-
         const currentId =
-            state.current_player_id ||
-            state.turn_player_id ||
-            state.current_player;
+            state.current_player_id;
+
 
         if(
-            me &&
+            currentId &&
+            myId &&
             String(currentId) ===
-            String(me.id)
+            String(myId)
         ){
 
             turnEl.textContent =
-                "نوبت شما";
+                "🎯 نوبت شما";
 
         }else{
 
             turnEl.textContent =
-                "نوبت بازیکن مقابل";
+                state.current_player_name
+                    ? `نوبت: ${state.current_player_name}`
+                    : "🎯 نوبت بازیکن مقابل";
         }
+
+
+    }else if(
+        phase === "finished"
+    ){
+
+        turnEl.textContent =
+            "🏆 بازی تمام شد";
+
 
     }else{
 
@@ -1650,61 +1826,78 @@ function render(state){
     }
 
 
-    /* نام بازیکن خودمان */
+    /* بازیکن خودمان */
 
     const me =
-        getMe(state);
+        findViewerPlayer(
+            state
+        );
+
 
     if(me){
 
-        document.getElementById("myName")
-            .textContent =
-                me.name ||
-                me.username ||
-                "بازیکن";
+        const name =
+            me.name ||
+            "بازیکن";
 
-        document.getElementById("myAvatar")
+
+        document
+            .getElementById(
+                "myName"
+            )
+            .textContent =
+                name;
+
+
+        document
+            .getElementById(
+                "myAvatar"
+            )
             .textContent =
                 initials(
-                    me.name ||
-                    me.username
+                    name
                 );
     }
 
 
-    /* دکمه شروع */
-
-    updateStartButton(state);
+    updateStartButton(
+        state
+    );
 
 
     /* مودال حکم */
 
     const modal =
-        document.getElementById("hokmModal");
+        document.getElementById(
+            "hokmModal"
+        );
+
 
     const isHakim =
         Boolean(
-            state.is_hakim ||
-            state.viewer_is_hakim ||
-            me?.is_hakim ||
-            (
-                state.hakim_id &&
-                me &&
-                String(state.hakim_id) ===
-                String(me.id)
-            )
+            state.hakim_id &&
+            myId &&
+            String(
+                state.hakim_id
+            ) ===
+            String(myId)
         );
+
 
     if(
         phase === "choose_hokm" &&
         isHakim
     ){
 
-        modal.classList.add("show");
+        modal.classList.add(
+            "show"
+        );
 
     }else{
 
-        modal.classList.remove("show");
+        modal.classList.remove(
+            "show"
+        );
     }
 }
 
@@ -1713,68 +1906,51 @@ function render(state){
    START BUTTON
 ========================================================= */
 
-function updateStartButton(state){
+function updateStartButton(
+    state
+){
 
     const btn =
-        document.getElementById("startBtn");
+        document.getElementById(
+            "startBtn"
+        );
+
 
     const refresh =
-        document.getElementById("refreshBtn");
+        document.getElementById(
+            "refreshBtn"
+        );
+
 
     const phase =
         state.phase ||
         "waiting";
 
-    const me =
-        getMe(state);
 
-    /*
-      چند روش مختلف برای تشخیص سازنده
-      پشتیبانی شده تا با نسخه فعلی بک‌اند
-      مشکل نداشته باشد.
-    */
-
-    const creatorId =
-        state.creator_id ??
-        state.owner_id ??
-        state.host_id ??
-        state.creator?.id ??
-        state.game?.creator_id ??
-        state.game?.owner_id;
-
-    const amCreator =
-        Boolean(
-            state.is_creator ||
-            state.viewer_is_creator ||
-            me?.is_creator ||
-            (
-                creatorId &&
-                me &&
-                String(creatorId) ===
-                String(me.id)
-            )
+    const myId =
+        viewerId(
+            state
         );
 
 
-    /*
-      اگر API خودش اجازه شروع را اعلام کرده
-      باشد، آن را هم قبول می‌کنیم.
-    */
+    const creatorId =
+        state.creator_id;
 
-    const canStart =
+
+    const amCreator =
         Boolean(
-            state.can_start ||
-            state.can_start_game ||
-            state.viewer_can_start
+            creatorId &&
+            myId &&
+            String(
+                creatorId
+            ) ===
+            String(myId)
         );
 
 
     if(
         phase === "waiting" &&
-        (
-            amCreator ||
-            canStart
-        )
+        amCreator
     ){
 
         btn.style.display =
@@ -1798,28 +1974,44 @@ function updateStartButton(state){
    SEATS
 ========================================================= */
 
-function updateSeat(seatId, player){
+function updateSeat(
+    seatId,
+    player
+){
 
     const seat =
-        document.getElementById(seatId);
+        document.getElementById(
+            seatId
+        );
+
 
     if(!seat){
         return;
     }
 
+
     const avatar =
-        seat.querySelector(".avatar");
+        seat.querySelector(
+            ".avatar"
+        );
+
 
     const name =
-        seat.querySelector(".player-name");
+        seat.querySelector(
+            ".player-name"
+        );
+
 
     const meta =
-        seat.querySelector(".player-meta");
+        seat.querySelector(
+            ".player-meta"
+        );
 
 
     if(!player){
 
-        avatar.textContent = "•";
+        avatar.textContent =
+            "•";
 
         name.textContent =
             "صندلی خالی";
@@ -1827,23 +2019,30 @@ function updateSeat(seatId, player){
         meta.textContent =
             "منتظر بازیکن";
 
+        seat.classList.remove(
+            "hakim",
+            "turn"
+        );
+
         return;
     }
 
 
     const playerName =
         player.name ||
-        player.username ||
-        player.first_name ||
         "بازیکن";
 
 
     avatar.textContent =
-        initials(playerName);
+        initials(
+            playerName
+        );
 
 
     name.innerHTML =
-        escapeHtml(playerName) +
+        escapeHtml(
+            playerName
+        ) +
         (
             player.is_hakim
                 ? " 👑"
@@ -1851,89 +2050,92 @@ function updateSeat(seatId, player){
         );
 
 
-    if(player.is_hakim){
+    if(
+        player.is_hakim
+    ){
 
         meta.textContent =
             "حاکم";
 
     }else if(
-        player.is_current ||
         player.is_turn
     ){
 
         meta.textContent =
-            "نوبت";
+            "🎯 نوبت";
 
     }else{
 
         meta.textContent =
-            "بازیکن";
+            `🎴 ${player.card_count ?? 0} کارت`;
     }
+
+
+    seat.classList.toggle(
+        "hakim",
+        Boolean(
+            player.is_hakim
+        )
+    );
+
+
+    seat.classList.toggle(
+        "turn",
+        Boolean(
+            player.is_turn
+        )
+    );
 }
 
 
-function renderSeats(state){
+function renderSeats(
+    state
+){
 
     const players =
-        getPlayers(state);
+        getPlayers(
+            state
+        );
 
-    const me =
-        getMe(state);
+
+    const myId =
+        viewerId(
+            state
+        );
 
 
-    /*
-      اول بازیکن خودمان را پیدا می‌کنیم.
-    */
-
-    let others =
+    const others =
         players.filter(
-            p =>
-                !me ||
-                String(p.id) !==
-                String(me.id)
+            player =>
+                String(
+                    player.id
+                ) !==
+                String(
+                    myId
+                )
         );
 
 
     /*
-      اگر بک‌اند صندلی را مشخص کرده
-      باشد همان را استفاده می‌کنیم.
+      فعلاً سه صندلی اطراف میز
+      از بین بازیکنان مقابل پر می‌شوند.
     */
-
-    const top =
-        players.find(
-            p =>
-                p.seat === "top" ||
-                p.position === "top"
-        );
-
-    const left =
-        players.find(
-            p =>
-                p.seat === "left" ||
-                p.position === "left"
-        );
-
-    const right =
-        players.find(
-            p =>
-                p.seat === "right" ||
-                p.position === "right"
-        );
-
 
     updateSeat(
         "seatTop",
-        top || others[0] || null
+        others[0] || null
     );
+
 
     updateSeat(
         "seatLeft",
-        left || others[1] || null
+        others[1] || null
     );
+
 
     updateSeat(
         "seatRight",
-        right || others[2] || null
+        others[2] || null
     );
 }
 
@@ -1942,51 +2144,79 @@ function renderSeats(state){
    TRICK
 ========================================================= */
 
-function renderTrick(state){
+function renderTrick(
+    state
+){
 
     const trick =
-        document.getElementById("trick");
+        document.getElementById(
+            "trick"
+        );
+
 
     trick.innerHTML =
-        `<div class="center-label">
+        `
+        <div class="center-label">
             کارت‌های بازی‌شده
-        </div>`;
+        </div>
+        `;
 
 
     const cards =
         state.current_trick ||
-        state.trick ||
         [];
 
 
     cards.forEach(
-        (item,index)=>{
+        (
+            item,
+            index
+        )=>{
+
+            const cardData =
+                item.card ||
+                item;
+
 
             const suit =
-                item.suit ||
+                cardData.suit ||
                 "";
+
 
             const rank =
-                item.rank ||
+                cardData.label ||
+                cardData.rank ||
                 "";
 
+
             const card =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             card.className =
                 "played " +
                 (
-                    cardIsRed(suit)
+                    cardIsRed(
+                        suit
+                    )
                         ? "red"
                         : ""
                 ) +
                 " p" +
-                (index + 1);
+                (
+                    index + 1
+                );
+
 
             card.textContent =
                 `${rank}${suit}`;
 
-            trick.appendChild(card);
+
+            trick.appendChild(
+                card
+            );
         }
     );
 }
@@ -1996,73 +2226,39 @@ function renderTrick(state){
    HAND
 ========================================================= */
 
-function renderHand(state){
+function renderHand(
+    state
+){
 
     const hand =
-        document.getElementById("hand");
+        document.getElementById(
+            "hand"
+        );
 
-    hand.innerHTML = "";
 
+    hand.innerHTML =
+        "";
+
+
+    /*
+      بازیکن خودمان را مستقیماً
+      از viewer_id پیدا می‌کنیم.
+    */
 
     const me =
-        getMe(state);
+        findViewerPlayer(
+            state
+        );
 
 
-    let mePlayer =
-        me;
+    if(!me){
 
-
-    const players =
-        getPlayers(state);
-
-
-    if(
-        !mePlayer &&
-        state.viewer_player_id
-    ){
-
-        mePlayer =
-            players.find(
-                p =>
-                    String(p.id) ===
-                    String(state.viewer_player_id)
-            );
-    }
-
-
-    if(
-        !mePlayer &&
-        state.user_player_id
-    ){
-
-        mePlayer =
-            players.find(
-                p =>
-                    String(p.id) ===
-                    String(state.user_player_id)
-            );
-    }
-
-
-    if(!mePlayer){
-
-        /*
-          بعضی نسخه‌های API مستقیماً
-          hand را در state می‌دهند.
-        */
-
-        mePlayer = {
-            cards:
-                state.hand ||
-                state.cards ||
-                []
-        };
+        return;
     }
 
 
     const cards =
-        mePlayer.cards ||
-        mePlayer.hand ||
+        me.cards ||
         [];
 
 
@@ -2072,63 +2268,79 @@ function renderHand(state){
 
 
     const currentPlayerId =
-        state.current_player_id ||
-        state.turn_player_id ||
-        state.current_player;
+        state.current_player_id;
 
 
     const myId =
-        mePlayer.id;
+        viewerId(
+            state
+        );
 
 
     const myTurn =
         phase === "playing" &&
-        (
-            !currentPlayerId ||
-            !myId ||
-            String(currentPlayerId) ===
-            String(myId)
+        currentPlayerId &&
+        myId &&
+        String(
+            currentPlayerId
+        ) ===
+        String(
+            myId
         );
 
 
-    /*
-      کارت خال لید برای قانون پیروی از خال
-    */
-
     const trick =
         state.current_trick ||
-        state.trick ||
         [];
 
 
-    const leadSuit =
+    const firstCard =
         trick.length
-            ? trick[0]?.suit
+            ? (
+                trick[0].card ||
+                trick[0]
+            )
+            : null;
+
+
+    const leadSuit =
+        firstCard
+            ? firstCard.suit
             : null;
 
 
     const hasLeadSuit =
         leadSuit
             ? cards.some(
-                c =>
-                    c.suit === leadSuit
+                card =>
+                    card.suit ===
+                    leadSuit
             )
             : false;
 
 
     cards.forEach(
-        (card)=>{
+        card => {
 
             const suit =
                 card.suit;
+
 
             const rank =
                 card.rank;
 
 
             let legal =
-                myTurn;
+                Boolean(
+                    myTurn
+                );
 
+
+            /*
+              قانون پیروی از خال:
+              اگر خال لید را داریم،
+              باید همان خال را بازی کنیم.
+            */
 
             if(
                 legal &&
@@ -2137,17 +2349,23 @@ function renderHand(state){
                 suit !== leadSuit
             ){
 
-                legal = false;
+                legal =
+                    false;
             }
 
 
             const el =
-                document.createElement("div");
+                document.createElement(
+                    "div"
+                );
+
 
             el.className =
                 "card " +
                 (
-                    cardIsRed(suit)
+                    cardIsRed(
+                        suit
+                    )
                         ? "red"
                         : ""
                 ) +
@@ -2158,9 +2376,15 @@ function renderHand(state){
                 );
 
 
-            el.innerHTML = `
+            const label =
+                card.label ||
+                rank;
+
+
+            el.innerHTML =
+                `
                 <div class="card-rank">
-                    ${escapeHtml(rank)}
+                    ${escapeHtml(label)}
                 </div>
 
                 <div class="card-suit">
@@ -2168,9 +2392,9 @@ function renderHand(state){
                 </div>
 
                 <div class="card-bottom">
-                    ${escapeHtml(rank)}
+                    ${escapeHtml(label)}
                 </div>
-            `;
+                `;
 
 
             if(legal){
@@ -2188,7 +2412,9 @@ function renderHand(state){
             }
 
 
-            hand.appendChild(el);
+            hand.appendChild(
+                el
+            );
         }
     );
 }
@@ -2211,9 +2437,14 @@ async function startGame(){
 
 
     const btn =
-        document.getElementById("startBtn");
+        document.getElementById(
+            "startBtn"
+        );
 
-    btn.disabled = true;
+
+    btn.disabled =
+        true;
+
 
     btn.textContent =
         "در حال شروع...";
@@ -2221,31 +2452,12 @@ async function startGame(){
 
     try{
 
-        const result =
-            await api(
-                `/api/game/${encodeURIComponent(gameId)}/start`,
-                {
-                    method:"POST"
-                }
-            );
-
-
-        /*
-          اگر API مستقیماً state جدید
-          برگرداند، همان را نمایش می‌دهیم.
-        */
-
-        if(result && (
-            result.phase ||
-            result.players ||
-            result.game
-        )){
-
-            currentState =
-                result;
-
-            render(result);
-        }
+        await api(
+            `/api/game/${encodeURIComponent(gameId)}/start`,
+            {
+                method:"POST"
+            }
+        );
 
 
         await loadGame();
@@ -2258,7 +2470,10 @@ async function startGame(){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         showMessage(
             error.message ||
@@ -2266,7 +2481,9 @@ async function startGame(){
         );
 
 
-        btn.disabled = false;
+        btn.disabled =
+            false;
+
 
         btn.textContent =
             "شروع بازی";
@@ -2278,7 +2495,9 @@ async function startGame(){
    CHOOSE HOKM
 ========================================================= */
 
-async function chooseHokm(suit){
+async function chooseHokm(
+    suit
+){
 
     if(!gameId){
         return;
@@ -2292,16 +2511,21 @@ async function chooseHokm(suit){
             {
                 method:"POST",
 
-                body:JSON.stringify({
-                    suit:suit
-                })
+                body:
+                    JSON.stringify({
+                        suit:suit
+                    })
             }
         );
 
 
         document
-            .getElementById("hokmModal")
-            .classList.remove("show");
+            .getElementById(
+                "hokmModal"
+            )
+            .classList.remove(
+                "show"
+            );
 
 
         await loadGame();
@@ -2314,7 +2538,10 @@ async function chooseHokm(suit){
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         showMessage(
             error.message ||
@@ -2339,12 +2566,14 @@ async function playCard(
         currentState.phase !==
         "playing"
     ){
+
         return;
     }
 
 
     element.style.pointerEvents =
         "none";
+
 
     element.style.transform =
         "translateY(-14px)";
@@ -2357,10 +2586,11 @@ async function playCard(
             {
                 method:"POST",
 
-                body:JSON.stringify({
-                    suit:suit,
-                    rank:rank
-                })
+                body:
+                    JSON.stringify({
+                        suit:suit,
+                        rank:rank
+                    })
             }
         );
 
@@ -2370,13 +2600,18 @@ async function playCard(
 
     }catch(error){
 
-        console.error(error);
+        console.error(
+            error
+        );
+
 
         element.style.pointerEvents =
             "auto";
 
+
         element.style.transform =
             "";
+
 
         showMessage(
             error.message ||
@@ -2387,18 +2622,22 @@ async function playCard(
 
 
 /* =========================================================
-   CLOSE TELEGRAM
+   CLOSE
 ========================================================= */
 
 document
-    .getElementById("closeBtn")
+    .getElementById(
+        "closeBtn"
+    )
     .addEventListener(
         "click",
         ()=>{
             if(tg){
+
                 try{
                     tg.close();
                 }catch(e){}
+
             }
         }
     );
