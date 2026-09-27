@@ -9,7 +9,6 @@ from telegram import (
     InlineQueryResultArticle,
     InputTextMessageContent,
     Update,
-    WebAppInfo,
 )
 from telegram.ext import (
     Application,
@@ -35,6 +34,7 @@ WEB_APP_URL = os.environ.get(
 
 
 def user_name(user) -> str:
+
     if user.full_name:
         return user.full_name
 
@@ -45,17 +45,29 @@ def user_name(user) -> str:
 
 
 def create_game_id() -> str:
+
     return secrets.token_hex(4)
 
 
 def mini_app_url(game_id: str) -> str:
+
     return (
         f"{WEB_APP_URL}/"
         f"?game={game_id}"
     )
 
 
+def main_mini_app_link(game_id: str) -> str:
+
+    return (
+        f"https://t.me/"
+        f"{BOT_USERNAME}"
+        f"?startapp={game_id}"
+    )
+
+
 def bot_link(game_id: str) -> str:
+
     return (
         f"https://t.me/"
         f"{BOT_USERNAME}"
@@ -64,6 +76,7 @@ def bot_link(game_id: str) -> str:
 
 
 def main_menu() -> InlineKeyboardMarkup:
+
     return InlineKeyboardMarkup(
         [
             [
@@ -83,6 +96,7 @@ def main_menu() -> InlineKeyboardMarkup:
 
 
 def mode_menu() -> InlineKeyboardMarkup:
+
     return InlineKeyboardMarkup(
         [
             [
@@ -120,8 +134,8 @@ def private_game_keyboard(
             [
                 InlineKeyboardButton(
                     "🎴 ورود به میز بازی",
-                    web_app=WebAppInfo(
-                        url=mini_app_url(game_id)
+                    url=main_mini_app_link(
+                        game_id
                     ),
                 )
             ],
@@ -145,15 +159,17 @@ def room_keyboard(
         [
             [
                 InlineKeyboardButton(
-                    "🎮 پیوستن به بازی",
-                    url=bot_link(game_id),
+                    "🎮 ورود به بازی",
+                    url=main_mini_app_link(
+                        game_id
+                    ),
                 )
             ],
             [
                 InlineKeyboardButton(
-                    "🎴 ورود به میز بازی",
-                    web_app=WebAppInfo(
-                        url=mini_app_url(game_id)
+                    "🔗 پیوستن از طریق ربات",
+                    url=bot_link(
+                        game_id
                     ),
                 )
             ],
@@ -180,6 +196,19 @@ def mode_name(
     return "۴ نفره"
 
 
+def human_player_count(
+    game,
+) -> int:
+
+    return len(
+        [
+            player
+            for player in game.players
+            if not player.is_bot
+        ]
+    )
+
+
 def room_text(
     game_id: str,
 ) -> str:
@@ -191,12 +220,16 @@ def room_text(
     if not game:
         return "❌ بازی پیدا نشد."
 
+    human_count = human_player_count(
+        game
+    )
+
     return (
         "♠️ <b>حکم گرین‌دریم</b> ♥️\n\n"
-        f"🎮 حالت: <b>{mode_name(game.max_players)}</b>\n"
+        f"🎮 حالت: <b>{mode_name(game.mode)}</b>\n"
         f"👥 بازیکنان: "
-        f"<b>{game.player_count if hasattr(game, 'player_count') else len(game.players)}</b>"
-        f"/<b>{game.max_players}</b>\n\n"
+        f"<b>{human_count}</b>"
+        f"/<b>{game.mode}</b>\n\n"
         "برای ورود به بازی روی دکمه زیر بزنید.\n"
         "سازنده می‌تواند بازی را از داخل میز شروع کند."
     )
@@ -337,8 +370,8 @@ async def create_game_with_mode(
 
         text = (
             "🎮 <b>بازی چهارنفره ساخته شد!</b>\n\n"
-            "لینک بازی را در گروه بفرستید تا سه بازیکن "
-            "دیگر وارد شوند.\n\n"
+            "این پیام را در گروه ارسال کنید تا "
+            "سه بازیکن دیگر وارد شوند.\n\n"
             "بعد از کامل شدن میز، سازنده بازی را شروع می‌کند."
         )
 
@@ -363,6 +396,9 @@ async def join_game(
         return
 
     user = update.effective_user
+
+    if not user:
+        return
 
     game = game_state.get_game(
         game_id
@@ -392,10 +428,10 @@ async def join_game(
 
     await message.reply_text(
         "✅ <b>وارد بازی شدید!</b>\n\n"
-        f"🎮 حالت: <b>{mode_name(game.max_players)}</b>\n"
+        f"🎮 حالت: <b>{mode_name(game.mode)}</b>\n"
         f"👥 بازیکنان حاضر: "
-        f"<b>{len(game.players)}</b>"
-        f"/<b>{game.max_players}</b>\n\n"
+        f"<b>{human_player_count(game)}</b>"
+        f"/<b>{game.mode}</b>\n\n"
         "حالا وارد میز بازی شوید.",
         parse_mode="HTML",
         reply_markup=private_game_keyboard(
@@ -416,6 +452,9 @@ async def play_game(
         return
 
     user = update.effective_user
+
+    if not user:
+        return
 
     game = game_state.get_game(
         game_id
@@ -463,9 +502,11 @@ async def settings_game(
 
     if query:
         user = query.from_user
-
     else:
         user = update.effective_user
+
+    if not user:
+        return
 
     game = game_state.get_game(
         game_id
@@ -494,10 +535,10 @@ async def settings_game(
     text = (
         "⚙️ <b>تنظیمات بازی</b>\n\n"
         f"🎮 حالت فعلی: "
-        f"<b>{mode_name(game.max_players)}</b>\n"
+        f"<b>{mode_name(game.mode)}</b>\n"
         f"👥 بازیکنان: "
-        f"<b>{len(game.players)}</b>"
-        f"/<b>{game.max_players}</b>\n\n"
+        f"<b>{human_player_count(game)}</b>"
+        f"/<b>{game.mode}</b>\n\n"
         "تغییر تنظیمات بعد از شروع بازی امکان‌پذیر نیست."
     )
 
@@ -632,6 +673,9 @@ async def inline_query(
 
     user = query.from_user
 
+    if not user:
+        return
+
     game_id = create_game_id()
 
     game_state.create_game(
@@ -646,7 +690,7 @@ async def inline_query(
         f"سازنده: <b>{user_name(user)}</b>\n"
         "🎮 حالت: <b>۴ نفره</b>\n"
         "👥 بازیکنان: <b>1/4</b>\n\n"
-        "برای پیوستن به بازی روی دکمه زیر بزنید."
+        "برای ورود به بازی روی دکمه زیر بزنید."
     )
 
     result = InlineQueryResultArticle(
